@@ -1,5 +1,6 @@
 #!/anaconda2/bin/python
-import warnings, sys
+import warnings, sys, os
+import datetime
 with warnings.catch_warnings():
     warnings.simplefilter('ignore')
 from Bio import SearchIO
@@ -19,30 +20,61 @@ __copyright__ = """
   #                                                                                              #
   ################################################################################################
 """
+#count time
+starttime=datetime.datetime.now()
 
 print __copyright__
 ###################################################################################
 #################################   PARAMETERS   ##################################
 ###################################################################################
 
+# to assure path exist
+
+def assure_path_exists(path):
+        dir = os.path.dirname(path)
+        if not os.path.exists(dir):
+                os.makedirs(dir)
+
+def assure_slash_exists(path):
+	
+	if path[-1]!='/' :
+		
+		path+="/"
+	return path	
 # Commandline arguments
 parser = argparse.ArgumentParser(description='Command-line options for freq_extractor')
 parser._action_groups.pop()
 required = parser.add_argument_group('required arguments')
 optional = parser.add_argument_group('optional arguments')
 required.add_argument('--ali', help='input alignment')
-required.add_argument('--database', help='hmm database')
-required.add_argument('--hmmer_path', help='HMMER executable directory')
-required.add_argument('--gb_path', help='Gblocks executable directory')
-optional.add_argument('--iqtree', action='store_true', help='flag to output frequency file in IQ-TREE supported format')
+required.add_argument('--output_path', help='output files directory')
+optional.add_argument('--database', help='hmm database file', default='example_files/database.hmm')
+optional.add_argument('--file_name', help='output file name', default='dEfAuLt')
+optional.add_argument('--hmmer_path', help='HMMER executable directory', default='bin/')
+optional.add_argument('--gb_path', help='Gblocks executable directory', default='bin/')
+optional.add_argument('--iq_path', help='IQ-TREE executable directory', default='bin/')
+#optional.add_argument('--iqtree', action='store_true', help='flag to output frequency file in IQ-TREE supported format')
 args = parser.parse_args()  # e.g. input alignment file: args.ali; output freq_file: args.out
 # Demanding required input
-if not (args.ali) or not (args.database) or not (args.hmmer_path) or not (args.gb_path): parser.error(' Please provide necessary input, "python '+sys.argv[0]+' -h" to see more info')
+if not (args.ali) or not (args.output_path) : parser.error(' Please provide necessary input, "python '+sys.argv[0]+' -h" to see more info')
 
 # 3rd-party program directories
 hmmscan_exe = str(args.hmmer_path)+'hmmscan'
 hmmfetch_exe = str(args.hmmer_path)+'hmmfetch'
 gblocks_exe = str(args.gb_path)+'Gblocks'
+iqtree_exe=str(args.iq_path)+'iqtree'
+if args.file_name=='dEfAuLt':                   #change default output file into input alignment name
+  args.file_name=((args.ali).split('/'))[-1]
+
+args.output_path=assure_slash_exists(args.output_path)
+args.hmmer_path=assure_slash_exists(args.hmmer_path)
+args.gb_path=assure_slash_exists(args.gb_path)
+args.iq_path=assure_slash_exists(args.iq_path)
+assure_path_exists(args.output_path)
+
+print hmmscan_exe
+print hmmfetch_exe
+print gblocks_exe
 
 # Empirical aa_freqs from LG model ordered as ARNDCQEGHILKMFPSTWYV
 # Probably do not need it now...
@@ -199,10 +231,10 @@ def ali_parser(alignment_file):
     #print '%d \n%s %s\n%s' % (np.amax(seq_score), seed_id, seed_seq, seed_to_ali_mapping)  # check
     
     seed_seq_record = SeqRecord(Seq(seed_seq.replace("-","")), id=seed_id)  # remove the 'gap' so it won't affect hmm_aa_freq mapping in the Main Processes
-    SeqIO.write(seed_seq_record, "temp_seed_seq.fasta", "fasta")
+    SeqIO.write(seed_seq_record, args.output_path+"temp_seed_seq.fasta", "fasta")
     
     # run hmmscan
-    subprocess.check_output([hmmscan_exe, '-o', 'temp_hmmscan.out', args.database, 'temp_seed_seq.fasta'])
+    subprocess.check_output([hmmscan_exe, '-o', args.output_path+'temp_hmmscan.out', args.database, args.output_path+'temp_seed_seq.fasta'])
 
     return (seed_seq_record, seed_to_ali_mapping)
    
@@ -230,7 +262,7 @@ def hmmscan_parser(out_file, qurey_id):
 ###################################################################################
 
 seed_seq, seed_to_ali_mapping = ali_parser(args.ali)[0], ali_parser(args.ali)[1]
-domains = hmmscan_parser('temp_hmmscan.out', seed_seq.id)
+domains = hmmscan_parser(args.output_path+'temp_hmmscan.out', seed_seq.id)
 hmm_database = HMM(args.database, seed_seq.id).hmm_database  # Storing target hmm profile into a HMM Class which is structured as a dictionary
 seed_seq_master = []  #The master list storing aa_freqs for the entire seed_seq
 
@@ -335,16 +367,16 @@ for record in full_ali_obj:
     record.description = ""
     i += 1
 
-AlignIO.write(full_ali_obj, args.ali+".temp_gb", "fasta")
+AlignIO.write(full_ali_obj, args.output_path+args.file_name+".temp_gb", "fasta")
 
 print "\n---------------------------- Gblocks output ----------------------------"
 try:
-    subprocess.check_output([gblocks_exe, args.ali+".temp_gb", "-b4=5", "-b5=h"])
+    subprocess.check_output([gblocks_exe, args.output_path+args.file_name+".temp_gb", "-b4=5", "-b5=h"])
 except subprocess.CalledProcessError as e:
     print e.output
 print "-------------------------------------------------------------------------\n\n"
 
-gbtrim_ali_obj = AlignIO.read(args.ali+".temp_gb-gb", "fasta")
+gbtrim_ali_obj = AlignIO.read(args.output_path+args.file_name+".temp_gb-gb", "fasta")
 i = 0
 for record in gbtrim_ali_obj:
     record.description = full_ali_seq_des[0]
@@ -358,16 +390,15 @@ gbtrim_ali_col_array = np.transpose(gbtrim_ali_raw_array)  # align_columns.shape
 
 print "Generating aa_freq files..."  # some checking status...
 
-aa_freqs_output_file = open(args.ali+".freq", 'w')  # for full original alignment
-aa_freqs_output_file_hmmtrim = open(args.ali+".hmmtrim.freq", 'w')  # for trimmed alignment where hmm profile was mapped
-aa_freqs_output_file_gbtrim = open(args.ali+".gbtrim.freq", 'w')  # for Gblocks trimmed alignment
+aa_freqs_output_file = open(args.output_path+args.file_name+".freq", 'w')  # for full original alignment
+aa_freqs_output_file_hmmtrim = open(args.output_path+args.file_name+".hmmtrim.freq", 'w')  # for trimmed alignment where hmm profile was mapped
+aa_freqs_output_file_gbtrim = open(args.output_path+args.file_name+".gbtrim.freq", 'w')  # for Gblocks trimmed alignment
 
 hmmtrim_ali_obj = full_ali_obj[:,0:0]  # initiating an empty alignment for hmmtrim
 hmmtrim_iqtree_site_pos = 1  # first element of the freq_file for hmmtrim in iqtree format
 gbtrim_iqtree_site_pos = 1  # first element of the freq_file for gbtrim in iqtree format
 for pos, aa_freq in enumerate(seed_to_ali_mapping):
     if type(aa_freq) is str:  # hmm_profile mapped
-        if args.iqtree:  # freq_file in iqtree format
             aa_freqs_output_file.write(str(pos+1)+" "+aa_freq+"\n")
             aa_freqs_output_file_hmmtrim.write(str(hmmtrim_iqtree_site_pos)+" "+aa_freq+"\n")
             hmmtrim_iqtree_site_pos += 1
@@ -379,39 +410,33 @@ for pos, aa_freq in enumerate(seed_to_ali_mapping):
             except IndexError:  # capture the IndexError when gbtrim positions are running out, so the rest of processes can continue
                 continue
 
-        else:
-            aa_freqs_output_file.write(aa_freq+"\n")
-            aa_freqs_output_file_hmmtrim.write(aa_freq+"\n")
-            try:
-                if full_ali_col_array[pos].tolist() == gbtrim_ali_col_array[gbtrim_iqtree_site_pos-1].tolist():
-                    while (gbtrim_iqtree_site_pos <= len(gbtrim_ali_col_array)):
-                        aa_freqs_output_file_gbtrim.write(aa_freq+"\n")
-                        gbtrim_iqtree_site_pos += 1
-            
-            except IndexError:  # capture the IndexError when gbtrim positions are running out, so the rest of processes can continue
-                continue
-
-        hmmtrim_ali_obj = hmmtrim_ali_obj[:,:] + full_ali_obj[:,pos-1:pos]
+       
         
     else:
-        if args.iqtree:  # freq_file in iqtree format
+         
             aa_freqs_output_file.write(str(pos+1)+" "+"NA\n")
-        else:
-            aa_freqs_output_file.write("NA\n")
+ 
 
 for record in hmmtrim_ali_obj:
     record.description = full_ali_seq_des[0]
     i += 1
 
-AlignIO.write(hmmtrim_ali_obj, args.ali+".hmmtrim", "fasta")
-AlignIO.write(gbtrim_ali_obj, args.ali+".gbtrim", "fasta")
+AlignIO.write(hmmtrim_ali_obj, args.output_path+args.file_name+".hmmtrim", "fasta")
+AlignIO.write(gbtrim_ali_obj, args.output_path+args.file_name+".gbtrim", "fasta")
 
 aa_freqs_output_file.close()
 aa_freqs_output_file_hmmtrim.close()
 aa_freqs_output_file_gbtrim.close()
-if args.iqtree:
-    print '\nFull alignment:\t\t%s\nHMM_profile mapped alignment:\t%s\nGblock trimmed alignment:\t%s' % (args.ali+".freq", args.ali+".hmmtrim.freq", args.ali+".gbtrim.freq")
-else:
-    print '\nFull alignment:\t%s\nHMM_profile mapped alignment:\t%s' % (args.ali+".freq", args.ali+".hmmtrim.freq")
-    
-print "\nAll processes are completed."
+
+print '\nFull alignment:\t\t%s\nHMM_profile mapped alignment:\t%s\nGblock trimmed alignment:\t%s' % (args.output_path+args.file_name+".freq", args.output_path+args.file_name+".hmmtrim.freq", args.output_path+args.file_name+".gbtrim.freq")
+
+
+#run IQ-TREE
+#print"executing iqtree ..."
+
+#subprocess.check_output([iqtree_exe, "-s", args.output_path+args.file_name+".temp_gb", "-m", "BLOSUM62"])
+
+#print "\nAll processes are completed."
+
+endtime=datetime.datetime.now()
+print "executive time:",(endtime-starttime).seconds ,"seconds"
