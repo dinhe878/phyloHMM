@@ -411,7 +411,7 @@ for pos, aa_freq in enumerate(seed_to_ali_mapping):
                 continue
 
        
-        
+            hmmtrim_ali_obj = hmmtrim_ali_obj[:,:] + full_ali_obj[:,pos-1:pos]
     else:
          
             aa_freqs_output_file.write(str(pos+1)+" "+"NA\n")
