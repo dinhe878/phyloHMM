@@ -3,7 +3,7 @@
 
 ## Purpose
 
-
+per-site amino-acid frequency profiles of protein domains
 
 ***
 ## Usage
