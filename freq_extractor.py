@@ -9,6 +9,7 @@ import numpy as np
 from Bio import AlignIO, SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
+from shutil import copyfile
 
 __copyright__ = """
   ################################################################################################
@@ -62,7 +63,7 @@ if not (args.ali) or not (args.output_path) : parser.error(' Please provide nece
 hmmscan_exe = str(args.hmmer_path)+'hmmscan'
 hmmfetch_exe = str(args.hmmer_path)+'hmmfetch'
 gblocks_exe = str(args.gb_path)+'Gblocks'
-iqtree_exe=str(args.iq_path)+'iqtree'
+iqtree_exe="../../"+str(args.iq_path)+'iqtree'
 if args.file_name=='dEfAuLt':                   #change default output file into input alignment name
   args.file_name=((args.ali).split('/'))[-1]
 
@@ -432,11 +433,26 @@ print '\nFull alignment:\t\t%s\nHMM_profile mapped alignment:\t%s\nGblock trimme
 
 
 #run IQ-TREE
-#print"executing iqtree ..."
+print"executing iqtree ..."
+print"runing gbtrim iqtree\n"
+if not os.path.isdir(args.output_path+"gbtrim_iqtree"):
+    os.mkdir(args.output_path+"gbtrim_iqtree", 0777)
+#gbtrim iqtree
+copyfile(args.output_path+args.file_name+".gbtrim",args.output_path+"gbtrim_iqtree/"+args.file_name+".gbtrim")
+copyfile(args.output_path+args.file_name+".gbtrim.freq",args.output_path+"gbtrim_iqtree/"+args.file_name+".gbtrim.freq")
 
-#subprocess.check_output([iqtree_exe, "-s", args.output_path+args.file_name+".temp_gb", "-m", "BLOSUM62"])
+subprocess.Popen([iqtree_exe,"-nt","4", "-s",args.file_name+".gbtrim", "-m", "LG+C20+F+G", "-fs",args.file_name+".gbtrim.freq"],cwd=(args.output_path+"gbtrim_iqtree"))
 
-#print "\nAll processes are completed."
+print" runing hmmtrim iqtree\n"
+if not os.path.isdir(args.output_path+"hmmtrim_iqtree"):
+    os.mkdir(args.output_path+"hmmtrim_iqtree", 0777)
+#hmmtrim iqtree
+
+copyfile(args.output_path+args.file_name+".hmmtrim",args.output_path+"hmmtrim_iqtree/"+args.file_name+".hmmtrim")
+copyfile(args.output_path+args.file_name+".hmmtrim.freq",args.output_path+"hmmtrim_iqtree/"+args.file_name+".hmmtrim.freq")
+
+subprocess.Popen([iqtree_exe,"-nt","4", "-s",args.file_name+".hmmtrim", "-m", "LG+C20+F+G", "-fs",args.file_name+".hmmtrim.freq"],cwd=(args.output_path+"hmmtrim_iqtree"))
+print "\nAll processes are completed."
 
 endtime=datetime.datetime.now()
 print "executive time:",(endtime-starttime).seconds ,"seconds"
