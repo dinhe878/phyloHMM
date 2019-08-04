@@ -40,6 +40,9 @@ the path of your iqtree file (default version: 1.6.10)
 ## example 
 ### use command:
 python freq_extractor.py --ali example_files/example_input.fasta --output_path output --file_name example1
+
+### iqtree script
+bash iqtree_script.sh output/example1.gbtrim output/example1.gbtrim.freq
 ## Support or Contact
 
 Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
