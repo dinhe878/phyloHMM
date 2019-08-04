@@ -433,28 +433,26 @@ print '\nFull alignment:\t\t%s\nHMM_profile mapped alignment:\t%s\nGblock trimme
 
 
 #run IQ-TREE
-print"executing iqtree ..."
-print"runing gbtrim iqtree\n"
-if not os.path.isdir(args.output_path+"gbtrim_iqtree"):
-    os.mkdir(args.output_path+"gbtrim_iqtree", 0777)
+#print"executing iqtree ..."
+#print"runing gbtrim iqtree\n"
+#if not os.path.isdir(args.output_path+"gbtrim_iqtree"):
+#    os.mkdir(args.output_path+"gbtrim_iqtree", 0777)
 #gbtrim iqtree
-copyfile(args.output_path+args.file_name+".gbtrim",args.output_path+"gbtrim_iqtree/"+args.file_name+".gbtrim")
-copyfile(args.output_path+args.file_name+".gbtrim.freq",args.output_path+"gbtrim_iqtree/"+args.file_name+".gbtrim.freq")
+#copyfile(args.output_path+args.file_name+".gbtrim",args.output_path+"gbtrim_iqtree/"+args.file_name+".gbtrim")
+#copyfile(args.output_path+args.file_name+".gbtrim.freq",args.output_path+"gbtrim_iqtree/"+args.file_name+".gbtrim.freq")
 
-subprocess.Popen([iqtree_exe,"-nt","4", "-s",args.file_name+".gbtrim", "-m", "LG+C20+F+G", "-fs",args.file_name+".gbtrim.freq"],cwd=(args.output_path+"gbtrim_iqtree"))
-"""
-print" runing hmmtrim iqtree\n"
-if not os.path.isdir(args.output_path+"hmmtrim_iqtree"):
-    os.mkdir(args.output_path+"hmmtrim_iqtree", 0777)
+#subprocess.Popen([iqtree_exe,"-nt","4", "-s",args.file_name+".gbtrim", "-m", "LG+C20+F+G", "-fs",args.file_name+".gbtrim.freq"],cwd=(args.output_path+"gbtrim_iqtree"))
+
+#print" runing hmmtrim iqtree\n"
+#if not os.path.isdir(args.output_path+"hmmtrim_iqtree"):
+#    os.mkdir(args.output_path+"hmmtrim_iqtree", 0777)
 #hmmtrim iqtree
 
-copyfile(args.output_path+args.file_name+".hmmtrim",args.output_path+"hmmtrim_iqtree/"+args.file_name+".hmmtrim")
-copyfile(args.output_path+args.file_name+".hmmtrim.freq",args.output_path+"hmmtrim_iqtree/"+args.file_name+".hmmtrim.freq")
+#copyfile(args.output_path+args.file_name+".hmmtrim",args.output_path+"hmmtrim_iqtree/"+args.file_name+".hmmtrim")
+#copyfile(args.output_path+args.file_name+".hmmtrim.freq",args.output_path+"hmmtrim_iqtree/"+args.file_name+".hmmtrim.freq")
 
-subprocess.Popen([iqtree_exe,"-nt","4", "-s",args.file_name+".hmmtrim", "-m", "LG+C20+F+G", "-fs",args.file_name+".hmmtrim.freq"],cwd=(args.output_path+"hmmtrim_iqtree"))
-
-"""
-print "\nAll processes are completed."
+#subprocess.Popen([iqtree_exe,"-nt","4", "-s",args.file_name+".hmmtrim", "-m", "LG+C20+F+G", "-fs",args.file_name+".hmmtrim.freq"],cwd=(args.output_path+"hmmtrim_iqtree"))
+#print "\nAll processes are completed."
 
 endtime=datetime.datetime.now()
 print "executive time:",(endtime-starttime).seconds ,"seconds"
