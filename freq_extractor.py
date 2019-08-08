@@ -403,6 +403,7 @@ for pos, aa_freq in enumerate(seed_to_ali_mapping):
             aa_freqs_output_file.write(str(pos+1)+" "+aa_freq+"\n")
             aa_freqs_output_file_hmmtrim.write(str(hmmtrim_iqtree_site_pos)+" "+aa_freq+"\n")
             hmmtrim_iqtree_site_pos += 1
+            hmmtrim_ali_obj = hmmtrim_ali_obj[:,:] + full_ali_obj[:,pos-1:pos]
             try:
                 if full_ali_col_array[pos].tolist() == gbtrim_ali_col_array[gbtrim_iqtree_site_pos-1].tolist():                    
                     aa_freqs_output_file_gbtrim.write(str(gbtrim_iqtree_site_pos)+" "+aa_freq+"\n")
@@ -412,7 +413,7 @@ for pos, aa_freq in enumerate(seed_to_ali_mapping):
                 continue
 
        
-            hmmtrim_ali_obj = hmmtrim_ali_obj[:,:] + full_ali_obj[:,pos-1:pos]
+            
     else:
          
             aa_freqs_output_file.write(str(pos+1)+" "+"NA\n")
