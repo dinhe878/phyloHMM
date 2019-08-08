@@ -403,6 +403,7 @@ for pos, aa_freq in enumerate(seed_to_ali_mapping):
             aa_freqs_output_file.write(str(pos+1)+" "+aa_freq+"\n")
             aa_freqs_output_file_hmmtrim.write(str(hmmtrim_iqtree_site_pos)+" "+aa_freq+"\n")
             hmmtrim_iqtree_site_pos += 1
+            hmmtrim_ali_obj = hmmtrim_ali_obj[:,:] + full_ali_obj[:,pos-1:pos]
             try:
                 if full_ali_col_array[pos].tolist() == gbtrim_ali_col_array[gbtrim_iqtree_site_pos-1].tolist():                    
                     aa_freqs_output_file_gbtrim.write(str(gbtrim_iqtree_site_pos)+" "+aa_freq+"\n")
@@ -412,7 +413,7 @@ for pos, aa_freq in enumerate(seed_to_ali_mapping):
                 continue
 
        
-            hmmtrim_ali_obj = hmmtrim_ali_obj[:,:] + full_ali_obj[:,pos-1:pos]
+            
     else:
          
             aa_freqs_output_file.write(str(pos+1)+" "+"NA\n")
@@ -442,7 +443,7 @@ copyfile(args.output_path+args.file_name+".gbtrim",args.output_path+"gbtrim_iqtr
 copyfile(args.output_path+args.file_name+".gbtrim.freq",args.output_path+"gbtrim_iqtree/"+args.file_name+".gbtrim.freq")
 
 subprocess.Popen([iqtree_exe,"-nt","4", "-s",args.file_name+".gbtrim", "-m", "LG+C20+F+G", "-fs",args.file_name+".gbtrim.freq"],cwd=(args.output_path+"gbtrim_iqtree"))
-"""
+
 print" runing hmmtrim iqtree\n"
 if not os.path.isdir(args.output_path+"hmmtrim_iqtree"):
     os.mkdir(args.output_path+"hmmtrim_iqtree", 0777)
@@ -453,8 +454,7 @@ copyfile(args.output_path+args.file_name+".hmmtrim.freq",args.output_path+"hmmtr
 
 subprocess.Popen([iqtree_exe,"-nt","4", "-s",args.file_name+".hmmtrim", "-m", "LG+C20+F+G", "-fs",args.file_name+".hmmtrim.freq"],cwd=(args.output_path+"hmmtrim_iqtree"))
 
-"""
-print "\nAll processes are completed."
 
-endtime=datetime.datetime.now()
-print "executive time:",(endtime-starttime).seconds ,"seconds"
+
+#endtime=datetime.datetime.now()
+#print "executive time:",(endtime-starttime).seconds ,"seconds"
