@@ -1,0 +1,115 @@
+# hmmscan :: search sequence(s) against a profile database
+# HMMER 3.1b2 (February 2015); http://hmmer.org/
+# Copyright (C) 2015 Howard Hughes Medical Institute.
+# Freely distributed under the GNU General Public License (GPLv3).
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# query sequence file:             example2/temp_seed_seq.fasta
+# target HMM database:             example_files/database.hmm
+# output directed to file:         example2/temp_hmmscan.out
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+Query:       Emiliania_huxleyi379@20130905_10578_1  [L=557]
+Description: <unknown description>
+Scores for complete sequence (score includes all domains):
+   --- full sequence ---   --- best 1 domain ---    -#dom-
+    E-value  score  bias    E-value  score  bias    exp  N  Model           Description
+    ------- ------ -----    ------- ------ -----   ---- --  --------        -----------
+    8.2e-67  225.2   0.0    1.3e-66  224.6   0.0    1.3  1  Tubulin          Tubulin/FtsZ family, GTPase domain
+    9.7e-41  138.9   0.2    1.5e-40  138.3   0.2    1.3  1  Tubulin_C        Tubulin C-terminal domain
+    5.9e-05   23.4   0.0    0.00013   22.3   0.0    1.5  1  Misat_Tub_SegII  Misato Segment II tubulin-like domain
+  ------ inclusion threshold ------
+      0.011   15.0   0.1       0.04   13.1   0.0    1.8  2  Tubulin_2        Tubulin like
+
+
+Domain annotation for each model (and alignments):
+>> Tubulin  Tubulin/FtsZ family, GTPase domain
+   #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+ ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
+   1 !  224.6   0.0   2.9e-70   1.3e-66       1     196 [.      15     223 ..      15     224 .. 0.99
+
+  Alignments for each domain:
+  == domain 1  score: 224.6 bits;  conditional E-value: 2.9e-70
+                                            EEEEEEEHHHHHHHHHHHHH...HHHCH..............HHHT.....TTEEEEE....EEESBHHHHH CS
+                                Tubulin   1 eiivigvGqcGnqignelwellakehgiqsdg..........dslesfFsesgkveyiprsvaidtdpqvln 62 
+                                            ei+ i+ GqcGnqig ++we++ +ehgi+++g          ++++++++e   ++y+pr+v++d++p +++
+  Emiliania_huxleyi379@20130905_10578_1  15 EIVSIQGGQCGNQIGAKFWEVVSDEHGIDPTGtyhgdsdlqlERINVYYNEATGGRYVPRAVLMDLEPGTMD 86 
+                                            79**************************98889******************999****************** PP
+
+                                            TS-GS........EEEE--CCCCTTC--TT-HHHHHHHHHHTHHHHHHHHTT-SE.SEEEEEEETTSSHHHH CS
+                                Tubulin  63 eikags..elfnpnklllgkegagnngaggypevgkeaaeeileeirkevekcdslqgffitaslgGGTGSG 132
+                                            ++++g+  ++f+p+++++g++gagnn+a+g+++ g+e+++++l+ +rke+e+cd+lqgf + +slgGGTGSG
+  Emiliania_huxleyi379@20130905_10578_1  87 SVRSGPfgQIFRPDNFVFGQSGAGNNWAKGHYTEGAELIDAVLDVVRKEAEGCDCLQGFTLSHSLGGGTGSG 158
+                                            ************************************************************************ PP
+
+                                            HHHHHHHHHHHTSTTSEEEEEEEE--.GG.G-HHHHHHHHHHHHHHHHT-SEEEEEEHHHHHCCS CS
+                                Tubulin 133 lgpvilevlkeeypkalvvtvvvlPs.efsevvvepynailalkelieesdavividNdaLlkil 196
+                                            +g++++++++eeyp++++++++v+Ps + s+ vvepyn +l++++l+e+sd  ++idN+aL++i+
+  Emiliania_huxleyi379@20130905_10578_1 159 MGTLLISKIREEYPDRVMCSYSVFPSpKVSDTVVEPYNCVLSIHQLVENSDESLLIDNEALYDIC 223
+                                            ****************************************************************8 PP
+
+>> Tubulin_C  Tubulin C-terminal domain
+   #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+ ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
+   1 !  138.3   0.2   3.3e-44   1.5e-40       1     124 [.     273     393 ..     273     395 .. 0.99
+
+  Alignments for each domain:
+  == domain 1  score: 138.3 bits;  conditional E-value: 3.3e-44
+                                            TTC-EEEEEEESSSCTTTTTCS-HHHHHHHHHTCSGGGBSSSTSTTTSSEEEEEEEEEESSSHHHHHHHHHH CS
+                              Tubulin_C   1 PrlhFlltsyaPlvsaekaavektsvqdvtrallepknimvkvdprkgkylaiallirGdvepkevnkavqr 72 
+                                            PrlhF+++++aPl+s+ ++++++++v ++t++++++kn+m+++dpr+g+yl++ +l+rG++++kev++++ +
+  Emiliania_huxleyi379@20130905_10578_1 273 PRLHFFMVGFAPLTSRGSQQYRSLTVPELTQQMFDAKNMMAAADPRHGRYLTCTALFRGRMSTKEVDEQMLN 344
+                                            9*********************************************************************** PP
+
+                                            HHHTTTS-BSTTSTTTEEEEEEECECT-TTTSSCEEEEEEEEGGGHHHHHHH CS
+                              Tubulin_C  73 ikekkkaqfveWiptgikvalnkkspyvkkqskvsvlmlaNttsiaelfkrl 124
+                                            +++k++++fveWip+++k+a+++ +p++ k+s   v +++N+t+++e+ kr+
+  Emiliania_huxleyi379@20130905_10578_1 345 VQNKNSSYFVEWIPNNMKCAICDIPPKGLKMS---VGFMGNSTCMQEVMKRV 393
+                                            ******************************99...*************9998 PP
+
+>> Misat_Tub_SegII  Misato Segment II tubulin-like domain
+   #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+ ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
+   1 !   22.3   0.0   2.9e-08   0.00013       1      68 [.      14      83 ..      14      94 .. 0.74
+
+  Alignments for each domain:
+  == domain 1  score: 22.3 bits;  conditional E-value: 2.9e-08
+                        Misat_Tub_SegII  1 rEivtlqlGnyaNyvgtHfWNtQesyftydeeeeesevdhdvlfre...getkqgqvtytPRllivDlkgs 68
+                                           rEiv++q G+  N +g+ fW +  +    d++    + d+d++       +++ +   y+PR++++Dl+ +
+  Emiliania_huxleyi379@20130905_10578_1 14 REIVSIQGGQCGNQIGAKFWEVVSDEHGIDPTGT-YHGDSDLQLERinvYYNEATGGRYVPRAVLMDLEPG 83
+                                           8********************9988887777777.44455544433111223566789*********9744 PP
+
+>> Tubulin_2  Tubulin like
+   #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+ ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
+   1 ?   13.1   0.0     9e-06      0.04     159     203 ..     146     188 ..     114     196 .. 0.80
+   2 ?   -1.5   0.0      0.25   1.1e+03      55     105 ..     316     361 ..     297     365 .. 0.67
+
+  Alignments for each domain:
+  == domain 1  score: 13.1 bits;  conditional E-value: 9e-06
+                              Tubulin_2 159 fVvgSLaGGTGSGiflDvayllrkilkeekqkvkiiglvllPdvf 203
+                                             +  SL GGTGSG+   ++  +r+++++       + ++++P+v 
+  Emiliania_huxleyi379@20130905_10578_1 146 TLSHSLGGGTGSGMGTLLISKIREEYPDRVM--CSYSVFPSPKVS 188
+                                            5667************************997..689999999985 PP
+
+  == domain 2  score: -1.5 bits;  conditional E-value: 0.25
+                              Tubulin_2  55 taekageslksrekealsissaevdr.ilrnllreetasaypsieeWlppel 105
+                                             + + g++l++++ +   +s +evd+ +l+ +      +++++  eW+p++ 
+  Emiliania_huxleyi379@20130905_10578_1 316 DP-RHGRYLTCTALFRGRMSTKEVDEqMLNVQN-----KNSSYFVEWIPNNM 361
+                                            23.568888999888889999999851555553.....33456789998875 PP
+
+
+
+Internal pipeline statistics summary:
+-------------------------------------
+Query sequence(s):                         1  (557 residues searched)
+Target model(s):                       17929  (3037991 nodes)
+Passed MSV filter:                       429  (0.0239277); expected 358.6 (0.02)
+Passed bias filter:                      380  (0.0211947); expected 358.6 (0.02)
+Passed Vit filter:                        34  (0.00189637); expected 17.9 (0.001)
+Passed Fwd filter:                         4  (0.000223102); expected 0.2 (1e-05)
+Initial search space (Z):              17929  [actual number of targets]
+Domain search space  (domZ):               4  [number of targets reported over threshold]
+# CPU time: 0.40u 5.89s 00:00:06.29 Elapsed: 00:00:05.93
+# Mc/sec: 285.36
+//
+[ok]
