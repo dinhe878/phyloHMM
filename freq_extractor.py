@@ -23,6 +23,8 @@ __copyright__ = """
 """
 #count time
 starttime=datetime.datetime.now()
+# Global variables
+
 
 print __copyright__
 ###################################################################################
@@ -81,101 +83,104 @@ print gblocks_exe
 # Probably do not need it now...
 #LG_aa_freqs = '2.34595 2.91338 3.49262 3.01205 4.45606 3.52632 2.83988 2.41146 3.78460 2.67538 2.34684 3.06526 3.47661 3.10027 3.17541 2.95790 2.93381 4.53976 3.46891 2.49357'
 
-# Global variables
-global seed_seq_m_start
-global seed_seq_m_end
+LG_MODEL="0.079066 0.055941 0.041977 0.053052 0.012937 0.040767 0.071586 0.057337 0.022355 0.062157 0.099081 0.064600 0.022951 0.042302 0.044040 0.061197 0.053287 0.012066 0.034155 0.069147"
+
 ###################################################################################
 ####################################   CLASS   ####################################
-###################################################################################
-class HMM:
-    
-    def __init__(self, hmm_file, seed_seq_id):
-        # creating a HMM structure for the target hmm profile(s) -> {profile_name_1:[{hmm_aa_freq_1},profile_length_1], profile_name_2:[{hmm_aa_freq_2},profile_length_2],...}
-        self.hmm_database = {}
-        match_freq_lines_pattern = re.compile(r"\d+\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+\d+\s+[A-Za-z].+")
-        insert_freq_lines_pattern = re.compile(r"(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)")
+###################################################################################   
+def HMM( hmm_file, seed_seq_id,hmm_database):
+    # creating a HMM structure for the target hmm profile(s) -> {profile_name_1:[{hmm_aa_freq_1},profile_length_1], profile_name_2:[{hmm_aa_freq_2},profile_length_2],...}
+    # self.hmm_database = {}
+    match_freq_lines_pattern = re.compile(r"\d+\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+\d+\s+[A-Za-z].+")
+    insert_freq_lines_pattern = re.compile(r"(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)")
 
+        
         # separate hmm_profile into blocks in the hmm_file, and parse profile information: NAME, LENG and aa_freq
-        with open(hmm_file, 'r+') as hmmF:
-            mmap_hmmF = mmap.mmap(hmmF.fileno(), 0)
-            target_hmm_profile_match = re.search('NAME\s+(.*)', mmap_hmmF)
-            if target_hmm_profile_match:
-                profile_name = target_hmm_profile_match.group(1).strip('\r')
-                print 'Found target hmm profile: %s' % (profile_name)
-                # running hmmfetch to retrieve the target hmm profile
-                target_hmm_lines = subprocess.check_output([hmmfetch_exe, args.database, profile_name])
-                target_hmm_lines = target_hmm_lines.split("//")[0]
-                profile_len = re.split("LENG\s+", target_hmm_lines)[1].split("\n")[0]
-                match_freq_lines = re.split("HMM\s+", target_hmm_lines)[1].split("\n")[5:-1][::3]  # first match starts from the 5th index line and then from it every 3rd line, the last line is empty
-                insert_freq_lines = re.split("HMM\s+", target_hmm_lines)[1].split("\n")[6:-1][::3]  # first match starts from the 6th index line and then from it every 3rd line, the last line is empty
+    with open(hmm_file, 'r+') as hmmF:
+        mmap_hmmF = mmap.mmap(hmmF.fileno(), 0)
+        #target_hmm_profile_match = re.search('NAME\s+(.*)', mmap_hmmF)
+        target_hmm_profile_match = re.search( seed_seq_id, mmap_hmmF)
+        if target_hmm_profile_match:
+            #profile_name = target_hmm_profile_match.group(1).strip('\r')
+            #print 'Found target hmm profile: %s' % (profile_name)
+            profile_name=seed_seq_id
+            print 'Found target hmm profile: %s' % (profile_name)
+            # running hmmfetch to retrieve the target hmm profile
+             #target_hmm_lines = subprocess.check_output([hmmfetch_exe, args.database, profile_name])
+            target_hmm_lines = subprocess.check_output([hmmfetch_exe, args.database, seed_seq_id])
+            target_hmm_lines = target_hmm_lines.split("//")[0]
+            profile_len = re.split("LENG\s+", target_hmm_lines)[1].split("\n")[0]
+            match_freq_lines = re.split("HMM\s+", target_hmm_lines)[1].split("\n")[5:-1][::3]  # first match starts from the 5th index line and then from it every 3rd line, the last line is empty
+            insert_freq_lines = re.split("HMM\s+", target_hmm_lines)[1].split("\n")[6:-1][::3]  # first match starts from the 6th index line and then from it every 3rd line, the last line is empty
                                 
-                # creating aa_freq structure -> (match_freq, insert_freq)
-                hmm_aa_freq = {'A': [[],[]], 'R': [[],[]], 'N': [[],[]], 'D': [[],[]], 'C': [[],[]], 'Q': [[],[]], \
-					'E': [[],[]], 'G': [[],[]], 'H': [[],[]], 'I': [[],[]], 'L': [[],[]], 'K': [[],[]], \
-					'M': [[],[]], 'F': [[],[]], 'P': [[],[]], 'S': [[],[]], 'T': [[],[]], 'W': [[],[]], \
-					'Y': [[],[]], 'V': [[],[]]}
+            # creating aa_freq structure -> (match_freq, insert_freq)
+            hmm_aa_freq = {'A': [[],[]], 'R': [[],[]], 'N': [[],[]], 'D': [[],[]], 'C': [[],[]], 'Q': [[],[]], \
+				'E': [[],[]], 'G': [[],[]], 'H': [[],[]], 'I': [[],[]], 'L': [[],[]], 'K': [[],[]], \
+				'M': [[],[]], 'F': [[],[]], 'P': [[],[]], 'S': [[],[]], 'T': [[],[]], 'W': [[],[]], \
+				'Y': [[],[]], 'V': [[],[]]}
 
-                # start processing profile_feq
-                for line in match_freq_lines:
-                    m_freq = re.findall(match_freq_lines_pattern, line)
-                    if m_freq is not None:
-                        hmm_aa_freq['A'][0].append(m_freq[0][0])
-                        hmm_aa_freq['C'][0].append(m_freq[0][1])
-                        hmm_aa_freq['D'][0].append(m_freq[0][2])
-                        hmm_aa_freq['E'][0].append(m_freq[0][3])
-                        hmm_aa_freq['F'][0].append(m_freq[0][4])
-                        hmm_aa_freq['G'][0].append(m_freq[0][5])
-                        hmm_aa_freq['H'][0].append(m_freq[0][6])
-                        hmm_aa_freq['I'][0].append(m_freq[0][7])
-                        hmm_aa_freq['K'][0].append(m_freq[0][8])
-                        hmm_aa_freq['L'][0].append(m_freq[0][9])
-                        hmm_aa_freq['M'][0].append(m_freq[0][10])
-                        hmm_aa_freq['N'][0].append(m_freq[0][11])
-                        hmm_aa_freq['P'][0].append(m_freq[0][12])
-                        hmm_aa_freq['Q'][0].append(m_freq[0][13])
-                        hmm_aa_freq['R'][0].append(m_freq[0][14])
-                        hmm_aa_freq['S'][0].append(m_freq[0][15])
-                        hmm_aa_freq['T'][0].append(m_freq[0][16])
-                        hmm_aa_freq['V'][0].append(m_freq[0][17])
-                        hmm_aa_freq['W'][0].append(m_freq[0][18])
-                        hmm_aa_freq['Y'][0].append(m_freq[0][19])
+             # start processing profile_feq
+            for line in match_freq_lines:
+                m_freq = re.findall(match_freq_lines_pattern, line)
+                if m_freq is not None:
+                    hmm_aa_freq['A'][0].append(m_freq[0][0])
+                    hmm_aa_freq['C'][0].append(m_freq[0][1])
+                    hmm_aa_freq['D'][0].append(m_freq[0][2])
+                    hmm_aa_freq['E'][0].append(m_freq[0][3])
+                    hmm_aa_freq['F'][0].append(m_freq[0][4])
+                    hmm_aa_freq['G'][0].append(m_freq[0][5])
+                    hmm_aa_freq['H'][0].append(m_freq[0][6])
+                    hmm_aa_freq['I'][0].append(m_freq[0][7])
+                    hmm_aa_freq['K'][0].append(m_freq[0][8])
+                    hmm_aa_freq['L'][0].append(m_freq[0][9])
+                    hmm_aa_freq['M'][0].append(m_freq[0][10])
+                    hmm_aa_freq['N'][0].append(m_freq[0][11])
+                    hmm_aa_freq['P'][0].append(m_freq[0][12])
+                    hmm_aa_freq['Q'][0].append(m_freq[0][13])
+                    hmm_aa_freq['R'][0].append(m_freq[0][14])
+                    hmm_aa_freq['S'][0].append(m_freq[0][15])
+                    hmm_aa_freq['T'][0].append(m_freq[0][16])
+                    hmm_aa_freq['V'][0].append(m_freq[0][17])
+                    hmm_aa_freq['W'][0].append(m_freq[0][18])
+                    hmm_aa_freq['Y'][0].append(m_freq[0][19])
 
-                for line in insert_freq_lines:
-                    i_freq = re.findall(insert_freq_lines_pattern, line)
-                    if i_freq is not None:
-                        hmm_aa_freq['A'][1].append(i_freq[0][0])
-                        hmm_aa_freq['C'][1].append(i_freq[0][1])
-                        hmm_aa_freq['D'][1].append(i_freq[0][2])
-                        hmm_aa_freq['E'][1].append(i_freq[0][3])
-                        hmm_aa_freq['F'][1].append(i_freq[0][4])
-                        hmm_aa_freq['G'][1].append(i_freq[0][5])
-                        hmm_aa_freq['H'][1].append(i_freq[0][6])
-                        hmm_aa_freq['I'][1].append(i_freq[0][7])
-                        hmm_aa_freq['K'][1].append(i_freq[0][8])
-                        hmm_aa_freq['L'][1].append(i_freq[0][9])
-                        hmm_aa_freq['M'][1].append(i_freq[0][10])
-                        hmm_aa_freq['N'][1].append(i_freq[0][11])
-                        hmm_aa_freq['P'][1].append(i_freq[0][12])
-                        hmm_aa_freq['Q'][1].append(i_freq[0][13])
-                        hmm_aa_freq['R'][1].append(i_freq[0][14])
-                        hmm_aa_freq['S'][1].append(i_freq[0][15])
-                        hmm_aa_freq['T'][1].append(i_freq[0][16])
-                        hmm_aa_freq['V'][1].append(i_freq[0][17])
-                        hmm_aa_freq['W'][1].append(i_freq[0][18])
-                        hmm_aa_freq['Y'][1].append(i_freq[0][19])
+            for line in insert_freq_lines:
+                i_freq = re.findall(insert_freq_lines_pattern, line)
+                if i_freq is not None:
+                    hmm_aa_freq['A'][1].append(i_freq[0][0])
+                    hmm_aa_freq['C'][1].append(i_freq[0][1])
+                    hmm_aa_freq['D'][1].append(i_freq[0][2])
+                    hmm_aa_freq['E'][1].append(i_freq[0][3])
+                    hmm_aa_freq['F'][1].append(i_freq[0][4])
+                    hmm_aa_freq['G'][1].append(i_freq[0][5])
+                    hmm_aa_freq['H'][1].append(i_freq[0][6])
+                    hmm_aa_freq['I'][1].append(i_freq[0][7])
+                    hmm_aa_freq['K'][1].append(i_freq[0][8])
+                    hmm_aa_freq['L'][1].append(i_freq[0][9])
+                    hmm_aa_freq['M'][1].append(i_freq[0][10])
+                    hmm_aa_freq['N'][1].append(i_freq[0][11])
+                    hmm_aa_freq['P'][1].append(i_freq[0][12])
+                    hmm_aa_freq['Q'][1].append(i_freq[0][13])
+                    hmm_aa_freq['R'][1].append(i_freq[0][14])
+                    hmm_aa_freq['S'][1].append(i_freq[0][15])
+                    hmm_aa_freq['T'][1].append(i_freq[0][16])
+                    hmm_aa_freq['V'][1].append(i_freq[0][17])
+                    hmm_aa_freq['W'][1].append(i_freq[0][18])
+                    hmm_aa_freq['Y'][1].append(i_freq[0][19])
                         
-                self.hmm_database[profile_name] = [hmm_aa_freq, profile_len]
+                
+            hmm_database[profile_name] = [hmm_aa_freq, profile_len]
 
-            else:
-                print "No hmm_profile found in the database!"
+        else:
+            print "No hmm_profile found in the database!"
             
-        # checking...
-#        for k, v in self.hmm_database.items():
-#            print k
-#            for aa, f in v[0].items():
-#                print '%s : match_poi_1 %s / insert_poi_1 %s' % (aa, f[0][0], f[1][0])
-#                print '%s : match_poi_-1 %s / insert_poi_-1 %s' % (aa, f[0][-1], f[1][-1])
-
+            # checking...
+#            for k, v in self.hmm_database.items():
+#                print k
+#               for aa, f in v[0].items():
+#                    print '%s : match_poi_1 %s / insert_poi_1 %s' % (aa, f[0][0], f[1][0])
+#                    print '%s : match_poi_-1 %s / insert_poi_-1 %s' % (aa, f[0][-1], f[1][-1])
+    return hmm_database
 
 ###################################################################################
 ##################################   FUNCTIONS   ##################################
@@ -199,17 +204,33 @@ def ali_parser(alignment_file):
 
     # obtain the seq with the highest coverage in the alignment
     array_score = np.copy(raw_array).astype(object)
+
     j = 0  # seq count
     while j < len(array_score):
         i = 0  # col count
         while i < len(col_scores):
-            if array_score[j][i] == '-': array_score[j][i] = 0
+            if array_score[j][i] == '-': array_score[j][i] = 0.0
             else:
-                array_score[j][i] = col_scores[i]
+                array_score[j][i] = float(col_scores[i])
+            
             i += 1
         j += 1
-    seq_score = np.sum(array_score, axis=1)
-    
+
+    seq_score=np.zeros( j )
+    #np_sum
+    j = 0  # seq count
+    while j < len(array_score):
+        i = 0  # col count
+        while i < len(col_scores):
+            seq_score[j]=seq_score[j]+array_score[j][i]
+            
+            i += 1
+        j += 1
+
+
+    #nuse_seq_score = np.sum(array_score, axis=1)
+    #print seq_score
+    #print nuse_seq_score
     #obtaining seed_seq related info
     seed_seq_array = raw_array[np.argmax(seq_score)]
     seed_seq = "".join(seed_seq_array)
@@ -243,45 +264,101 @@ def ali_parser(alignment_file):
 def hmmscan_parser(out_file, qurey_id):
     domain_info = {}  # store domain(s) info
     for QueryResult in SearchIO.parse(out_file,'hmmer3-text'):
+       
         if qurey_id in str(QueryResult.id):
             #print QueryResult.description
             for hit in QueryResult.hits:  # TO-DO: need to control for multiple hits, comparing e-values?
                 domain_info[hit.id] = []
                 for HSPFragments in hit.hsps:  # multiple domains
+                  
                     query_hit_start = HSPFragments.query_start+1 # parsed start position appears to be 1 site short
                     query_hit_seq = HSPFragments.query.seq
                     query_hit_end = HSPFragments.query_end
                     domain_hit_start = HSPFragments.hit_start+1
                     domain_hit_end = HSPFragments.hit_end
-                
                     domain_info[hit.id].append([query_hit_start, query_hit_end, query_hit_seq, domain_hit_start, domain_hit_end])
 	
 	return domain_info
 
+#add default frequency to the non-matching positions ( use LG model )
+def add_default_model(alignment,default_model):   
+    
+    for pos, freq in enumerate(alignment):
+        if type(freq) is str:
+            continue
+
+        else:
+            freq=str(default_model) 
+            alignment[pos]=str(default_model)
+    return alignment
 ###################################################################################
 ###############################   MAIN PROCESSES   ################################
 ###################################################################################
 
 seed_seq, seed_to_ali_mapping = ali_parser(args.ali)[0], ali_parser(args.ali)[1]
 domains = hmmscan_parser(args.output_path+'temp_hmmscan.out', seed_seq.id)
-hmm_database = HMM(args.database, seed_seq.id).hmm_database  # Storing target hmm profile into a HMM Class which is structured as a dictionary
-seed_seq_master = []  #The master list storing aa_freqs for the entire seed_seq
+hmm_database = {}
+'''
+highest_key=""
+get_the_highest_key=0
+for key, value in domains.iteritems():
+    #print  value
+    if get_the_highest_key==0:
+        highest_domain={key:value}
+        highest_key=key
+        get_the_highest_key=1
+   # if domains[key]!=domains.keys()[-1]:
+   #     del domains[key]
+    
 
+print highest_key
+'''
+for key, value in domains.iteritems():
+#hmm_database = HMM(args.database, seed_seq.id).hmm_database  # Storing target hmm profile into a HMM Class which is structured as a dictionary
+   
+    hmm_database = HMM(args.database, key,hmm_database )
+
+alimentObj = AlignIO.read(args.ali, "fasta")
+
+seed_seq_master = [[]]*len(alimentObj[0])  #The master list storing aa_freqs for the entire seed_seq
+
+
+##### LET HMM_database order as score
+'''
+domains_order = {}
+dom_key=(domains.keys())
+
+
+for i in dom_key[::-1]:
+    domains_order[i]=domains[i]
+    print i
+#print domains_order
+'''
+
+
+seq_start_end_list = []
 #Getting the aa_freqs from respective hmms, storing structure see HMM.py
-for hmm_name, hits in sorted(domains.items(), key=operator.itemgetter([1][0])):  #The aa_seqs should be recorded in from the N-terminal to C-terminal of the seed seq
+#for hmm_name, hits in sorted(domains.items(), key=operator.itemgetter([1][0])):  #The aa_seqs should be recorded in from the N-terminal to C-terminal of the seed seq
+for hmm_name, hits in (domains.items()):
+    #print hmm_database[hmm_name]
+    print hmm_name
+
     if hmm_database[hmm_name] is not None:
         for hit_info in hits:    
             seed_seq_m_start = int(hit_info[0])  #Seed seq match start
+            seq_count=seed_seq_m_start
+            seq_start_end_list.append(seed_seq_m_start)
             seed_seq_m_end = int(hit_info[1])  #Seed seq match end
+            seq_start_end_list.append(seed_seq_m_end)
             dm_seed_seq = str(hit_info[2])  #Domain matching seed seq
             dm_start = int(hit_info[3])  #Doamin match start
             dm_end = int(hit_info[4])  #Doamin match end
-        
             # Mapping the aa_freqs to seed_seq sites according to the hmmscan output
             hmmscan_seed_seq = list(dm_seed_seq)  #A list storing dm_seed_seq site-by-site
-
             j = 0  #Check for insert state so the pointer maps correctly to the domain position
             for i, seed_seq_site in enumerate(hmmscan_seed_seq):
+                
+                
                 if seed_seq_site.isalpha() and seed_seq_site.isupper():
                     #Replace the site with a list of matching-state aa_freqs in the order of 'ARNDCQEGHILKMFPSTWYV'
                     #print i, seed_seq_site, i+dm_start-1-j, hmm_database[hmm_name][0]['A'][0][i+dm_start-1-j]  # Check
@@ -330,32 +407,63 @@ for hmm_name, hits in sorted(domains.items(), key=operator.itemgetter([1][0])): 
                     hmmscan_seed_seq[i].append(hmm_database[hmm_name][0]['Y'][1][i+dm_start-1-j])
                     hmmscan_seed_seq[i].append(hmm_database[hmm_name][0]['V'][1][i+dm_start-1-j])
                 elif seed_seq_site == '-':
-                    continue  #Skipping the deletion state
+                    pass
+                    #continue  #Skipping the deletion state
                 else:
                     print "Something is not right!!!"
                     break
 
-            seed_seq_master += hmmscan_seed_seq
+
+                if  seed_seq_master[seq_count]:
+                    pass
+                else:
+                    seed_seq_master[seq_count]= hmmscan_seed_seq[i]
+                seq_count+=1
+            #seed_seq_master += hmmscan_seed_seq
+
+
+
+
+
+
+
 
     else:
         print "something is not right..." # Check
 
 for i, aa_freqs in enumerate(seed_seq_master):
-    if isinstance(aa_freqs, list):
-        aa_freqs = map(lambda x: float(x), aa_freqs)
-        aa_freqs = map(lambda x: math.exp(-x), aa_freqs)  # aa_freq unit concersion (need to check possible numerical problem: sum(aa_freq) == 1 for each site)
-        aa_freqs = map(lambda x: str(x), aa_freqs)
-        seed_seq_master[i] = " ".join(aa_freqs)  #Construct the aa_freq string
+    #if isinstance(aa_freqs, list):
+     if  seed_seq_master[i]=='-':
+         continue
+     elif seed_seq_master[i] :
+         aa_freqs = map(lambda x: float(x), aa_freqs)
+         aa_freqs = map(lambda x: math.exp(-x),aa_freqs)  # aa_freq unit concersion (need to check possible numerical problem: sum(aa_freq) == 1 for each site)
+         aa_freqs = map(lambda x: str(x), aa_freqs)
+         seed_seq_master[i] = " ".join(aa_freqs)  # Construct the aa_freq string
+     else:
 
+        pass
 seed_seq_master = filter(lambda x: x != "-", seed_seq_master)  #Discard deletion states "-"
-
+#print seed_seq_m_start, seed_seq_m_end
 # Mapping the aa_freqs to original alignment sites
+for i in range(0,len(seq_start_end_list),2):
+    seed_seq_m_start=seq_start_end_list[i]
+
+    seed_seq_m_end=seq_start_end_list[i+1]
+    while seed_seq_m_start <= seed_seq_m_end:
+        seed_to_ali_mapping = [seed_seq_master[seed_seq_m_start] if x == seed_seq_m_start else x for x in seed_to_ali_mapping]
+        seed_seq_m_start += 1
+
+'''
 while seed_seq_m_start <= seed_seq_m_end:
     for site_aa_freq in seed_seq_master:
         seed_to_ali_mapping = [site_aa_freq if x == seed_seq_m_start else x for x in seed_to_ali_mapping]
         seed_seq_m_start += 1
-
+'''
+#print seed_to_ali_mapping
 #Output the aa_freq for full & hmm_trimmed alignments
+
+
 full_ali_obj = AlignIO.read(args.ali, "fasta")  # have to read the original alignment again!
 
 # Executing Gblocks processes
@@ -371,18 +479,24 @@ for record in full_ali_obj:
 AlignIO.write(full_ali_obj, args.output_path+args.file_name+".temp_gb", "fasta")
 
 print "\n---------------------------- Gblocks output ----------------------------"
+
 try:
-    subprocess.check_output([gblocks_exe, args.output_path+args.file_name+".temp_gb", "-b4=5", "-b5=h"])
+    subprocess.check_output([gblocks_exe, args.output_path+args.file_name+".temp_gb", "-b4=5", "-b5=h", "-p=t"])
 except subprocess.CalledProcessError as e:
     print e.output
 print "-------------------------------------------------------------------------\n\n"
+
 
 gbtrim_ali_obj = AlignIO.read(args.output_path+args.file_name+".temp_gb-gb", "fasta")
 i = 0
 for record in gbtrim_ali_obj:
     record.description = full_ali_seq_des[0]
+    gbtrim_len=len(record)
+    gbt_ali=record
     i += 1
 
+for r in full_ali_obj:
+    full_ali=r
 full_ali_raw_array = np.array([list(rec) for rec in full_ali_obj], np.character, order="F")  # Convert alignment object to np_array object
 full_ali_col_array = np.transpose(full_ali_raw_array)  # align_columns.shape == (#col, #raw), i.e. (#site, #seq)
 gbtrim_ali_raw_array = np.array([list(rec) for rec in gbtrim_ali_obj], np.character, order="F")  # Convert alignment object to np_array object
@@ -394,29 +508,75 @@ print "Generating aa_freq files..."  # some checking status...
 aa_freqs_output_file = open(args.output_path+args.file_name+".freq", 'w')  # for full original alignment
 aa_freqs_output_file_hmmtrim = open(args.output_path+args.file_name+".hmmtrim.freq", 'w')  # for trimmed alignment where hmm profile was mapped
 aa_freqs_output_file_gbtrim = open(args.output_path+args.file_name+".gbtrim.freq", 'w')  # for Gblocks trimmed alignment
+#aa_test_full_array=open(args.output_path+args.file_name+"full.txt", 'w')
+#aa_test_gb_array=open(args.output_path+args.file_name+"gb.txt", 'w')
+
 
 hmmtrim_ali_obj = full_ali_obj[:,0:0]  # initiating an empty alignment for hmmtrim
 hmmtrim_iqtree_site_pos = 1  # first element of the freq_file for hmmtrim in iqtree format
 gbtrim_iqtree_site_pos = 1  # first element of the freq_file for gbtrim in iqtree format
+match_count=0
+
+#Write hmmtrim.freq
+for pos, aa_freq in enumerate(seed_to_ali_mapping):
+    if type(aa_freq) is str:
+        aa_freqs_output_file_hmmtrim.write(str(hmmtrim_iqtree_site_pos)+" "+aa_freq+"\n")
+        hmmtrim_iqtree_site_pos += 1
+        hmmtrim_ali_obj = hmmtrim_ali_obj[:,:] + full_ali_obj[:,pos-1:pos]
+
+
+#add LG_MODEL
+seed_to_ali_mapping=add_default_model(seed_to_ali_mapping,LG_MODEL)
+
+
+#Write .freq and gbtrim.freq
+
 for pos, aa_freq in enumerate(seed_to_ali_mapping):
     if type(aa_freq) is str:  # hmm_profile mapped
             aa_freqs_output_file.write(str(pos+1)+" "+aa_freq+"\n")
-            aa_freqs_output_file_hmmtrim.write(str(hmmtrim_iqtree_site_pos)+" "+aa_freq+"\n")
-            hmmtrim_iqtree_site_pos += 1
-            hmmtrim_ali_obj = hmmtrim_ali_obj[:,:] + full_ali_obj[:,pos-1:pos]
+            #aa_freqs_output_file_hmmtrim.write(str(hmmtrim_iqtree_site_pos)+" "+aa_freq+"\n")
+            #hmmtrim_iqtree_site_pos += 1
+            #hmmtrim_ali_obj = hmmtrim_ali_obj[:,:] + full_ali_obj[:,pos-1:pos]
             try:
-                if full_ali_col_array[pos].tolist() == gbtrim_ali_col_array[gbtrim_iqtree_site_pos-1].tolist():                    
+                
+
+                gbtrim_iqtree_site_pos=1
+
+
+                for gaca in range(match_count,len(gbtrim_ali_col_array)):            
+        
+                    if full_ali_col_array[pos].tolist() == gbtrim_ali_col_array[gaca].tolist():
+                        match_count+=1
+                        #print "\n"+str(pos)+"\t"+str(gbtrim_iqtree_site_pos)
+                        #print full_ali_col_array[pos].tolist()
+                        aa_freqs_output_file_gbtrim.write(str(match_count)+" "+str(aa_freq)+"\n")
+                    
+                        break
+                    gbtrim_iqtree_site_pos=gbtrim_iqtree_site_pos+1    
+
+
+
+                '''
+
+                    ###previous write gbrim_freq########3
+
+            
+                #aa_test_full_array.write(str(pos)+":  "+str(full_ali_col_array[pos])+"\n")
+                
+                if full_ali_col_array[pos].tolist() == gbtrim_ali_col_array[gbtrim_iqtree_site_pos-1].tolist():     
+                               
                     aa_freqs_output_file_gbtrim.write(str(gbtrim_iqtree_site_pos)+" "+aa_freq+"\n")
                     gbtrim_iqtree_site_pos += 1
-
+                '''
             except IndexError:  # capture the IndexError when gbtrim positions are running out, so the rest of processes can continue
-                continue
+               continue
 
        
             
-    else:
+    #else:
          
-            aa_freqs_output_file.write(str(pos+1)+" "+"NA\n")
+            #aa_freqs_output_file.write(str(pos+1)+" "+"NA\n")
+           
  
 
 for record in hmmtrim_ali_obj:
@@ -432,12 +592,13 @@ aa_freqs_output_file_gbtrim.close()
 
 print '\nFull alignment:\t\t%s\nHMM_profile mapped alignment:\t%s\nGblock trimmed alignment:\t%s' % (args.output_path+args.file_name+".freq", args.output_path+args.file_name+".hmmtrim.freq", args.output_path+args.file_name+".gbtrim.freq")
 
-
+'''
 #run IQ-TREE
 print"executing iqtree ..."
 print"runing gbtrim iqtree\n"
 if not os.path.isdir(args.output_path+"gbtrim_iqtree"):
     os.mkdir(args.output_path+"gbtrim_iqtree", 0777)
+
 #gbtrim iqtree
 copyfile(args.output_path+args.file_name+".gbtrim",args.output_path+"gbtrim_iqtree/"+args.file_name+".gbtrim")
 copyfile(args.output_path+args.file_name+".gbtrim.freq",args.output_path+"gbtrim_iqtree/"+args.file_name+".gbtrim.freq")
@@ -454,7 +615,17 @@ copyfile(args.output_path+args.file_name+".hmmtrim.freq",args.output_path+"hmmtr
 
 subprocess.Popen([iqtree_exe,"-nt","4", "-s",args.file_name+".hmmtrim", "-m", "LG+C20+F+G", "-fs",args.file_name+".hmmtrim.freq"],cwd=(args.output_path+"hmmtrim_iqtree"))
 
+'''
 
 
-#endtime=datetime.datetime.now()
-#print "executive time:",(endtime-starttime).seconds ,"seconds"
+############full fredom iqtree########
+'''
+if not os.path.isdir(args.output_path+"full_iqtree"):
+    os.mkdir(args.output_path+"full_iqtree", 0777)
+copyfile(args.ali,args.output_path+"full_iqtree/"+args.file_name+".fasta")
+copyfile(args.output_path+args.file_name+".freq",args.output_path+"full_iqtree/"+args.file_name+".freq")
+
+subprocess.Popen([iqtree_exe,"-nt","4", "-s",args.file_name+".fasta", "-m", "LG+C20+F+G", "-fs",args.file_name+".freq"],cwd=(args.output_path+"full_iqtree"))
+'''
+endtime=datetime.datetime.now()
+print "executive time:",(endtime-starttime).seconds ,"seconds"
