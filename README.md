@@ -1,37 +1,45 @@
-## phyloHMM (now this is underconstruction)
+# phyloHMM (now this is underconstruction)
 
-You can use the [editor on GitHub](https://github.com/dinhe878/phyloHMM/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+## Purpose
 
-### Markdown
+per-site amino-acid frequency profiles of protein domains
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+***
+## Usage
+1.Clone the repo.
 
-```markdown
-Syntax highlighted code block
+2.Go to the project's root folder.
 
-# Header 1
-## Header 2
-### Header 3
+3.Please install python and biopython.
 
-- Bulleted
-- List
+4.Use python to execuate your files.
+***
+## required parameter
+### --ali (input alignment) 
 
-1. Numbered
-2. List
+### --output_path (path)  
+the directory of your output path
 
-**Bold** and _Italic_ and `Code` text
+## optional parameter
+### --database (hmm database)   
+the hmm database you want to use. (default version: 3.1b1 | May 2013)
 
-[Link](url) and ![Image](src)
-```
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+### --file_name (output file name)  
+your output file name. (default is your input file name)
 
-### Jekyll Themes
+### --hmmer_path (path)
+  the path of your hmmer scripts (hmmfetch hmmpress hmmscan)  (default version: h3.1b2 | February 2015)
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/dinhe878/phyloHMM/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
+### --gb_path (path)
+the path of your gblocks file (default version: 0.91b)
+### --iq_path (path)
+the path of your iqtree file (default version: 1.6.10)
+***
+## example 
+### use command:
+python freq_extractor.py --ali example_files/example_input.fasta --output_path output --file_name example1
+## Support or Contact
 
 Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.

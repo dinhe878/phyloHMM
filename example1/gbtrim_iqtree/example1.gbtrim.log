@@ -1,0 +1,521 @@
+IQ-TREE multicore version 1.6.10 for Linux 64-bit built Feb 19 2019
+Developed by Bui Quang Minh, Nguyen Lam Tung, Olga Chernomor,
+Heiko Schmidt, Dominik Schrempf, Michael Woodhams.
+
+Host:    IASL-TEA9262 (AVX, 15 GB RAM)
+Command: ../../bin/iqtree -nt 4 -s example1.gbtrim -m LG+C20+F+G -fs example1.gbtrim.freq
+Seed:    672365 (Using SPRNG - Scalable Parallel Random Number Generator)
+Time:    Thu Sep 19 16:00:11 2019
+Kernel:  AVX - 4 threads (8 CPU cores detected)
+
+Reading alignment file example1.gbtrim ... Fasta format detected
+Alignment most likely contains protein sequences
+Alignment has 285 sequences with 370 columns, 366 distinct patterns
+263 parsimony-informative, 47 singleton sites, 60 constant sites
+     Gap/Ambiguity  Composition  p-value
+   1  0      0.00%    passed    100.00%
+   2  1      0.00%    passed    100.00%
+   3  2     46.49%    passed     95.96%
+   4  3      0.00%    passed     99.15%
+   5  4      0.00%    passed    100.00%
+   6  5      0.00%    passed     98.67%
+   7  6      0.00%    passed    100.00%
+   8  7     14.59%    passed    100.00%
+   9  8      0.00%    passed    100.00%
+  10  9      0.00%    passed    100.00%
+  11  10    20.54%    passed     99.51%
+  12  11     0.00%    passed    100.00%
+  13  12     3.24%    passed    100.00%
+  14  13     0.00%    passed     99.99%
+  15  14     0.00%    passed    100.00%
+  16  15     0.00%    passed    100.00%
+  17  16    64.32%    passed     99.03%
+  18  17     5.14%    passed    100.00%
+  19  18    10.27%    passed    100.00%
+  20  19     0.00%    passed    100.00%
+  21  20     0.54%    passed     99.99%
+  22  21     0.00%    passed    100.00%
+  23  22     0.27%    passed     99.98%
+  24  23     0.54%    passed    100.00%
+  25  24    50.00%    passed     99.06%
+  26  25    24.86%    passed     92.78%
+  27  26    55.14%    passed     87.88%
+  28  27     7.03%    passed     99.63%
+  29  28     0.00%    passed    100.00%
+  30  29     0.00%    passed    100.00%
+  31  30    48.11%    passed     95.68%
+  32  31     0.00%    passed     51.86%
+  33  32     0.00%    passed    100.00%
+  34  33     0.00%    passed    100.00%
+  35  34    61.62%    passed     62.25%
+  36  35     0.00%    passed     99.78%
+  37  36     0.00%    passed    100.00%
+  38  37    60.27%    passed     37.90%
+  39  38     0.00%    passed    100.00%
+  40  39     0.00%    passed    100.00%
+  41  40     0.00%    passed    100.00%
+  42  41     0.00%    passed    100.00%
+  43  42     0.00%    passed    100.00%
+  44  43     4.59%    passed     99.89%
+  45  44     0.27%    passed    100.00%
+  46  45     0.27%    passed    100.00%
+  47  46     0.00%    passed    100.00%
+  48  47     0.00%    passed    100.00%
+  49  48     1.89%    passed    100.00%
+  50  49     0.00%    passed     98.57%
+  51  50     0.00%    passed    100.00%
+  52  51     0.00%    passed    100.00%
+  53  52    32.97%    passed     98.78%
+  54  53     0.27%    passed    100.00%
+  55  54    18.11%    passed     99.97%
+  56  55    33.78%    passed     99.49%
+  57  56     0.00%    passed    100.00%
+  58  57     5.14%    passed     99.98%
+  59  58     0.00%    passed    100.00%
+  60  59     0.00%    passed    100.00%
+  61  60     0.00%    passed    100.00%
+  62  61     0.00%    passed    100.00%
+  63  62     0.27%    passed    100.00%
+  64  63     0.00%    passed    100.00%
+  65  64     0.00%    passed     99.99%
+  66  65     0.00%    passed    100.00%
+  67  66     0.00%    passed     93.59%
+  68  67     0.00%    passed     99.54%
+  69  68    19.73%    passed     94.64%
+  70  69     0.00%    passed    100.00%
+  71  70    44.59%    passed     90.65%
+  72  71     0.00%    passed    100.00%
+  73  72     0.00%    passed    100.00%
+  74  73     0.00%    passed     89.87%
+  75  74     0.00%    passed    100.00%
+  76  75     0.00%    passed    100.00%
+  77  76     0.00%    passed     34.85%
+  78  77     0.00%    passed     99.54%
+  79  78     0.00%    passed    100.00%
+  80  79     0.00%    passed    100.00%
+  81  80     0.00%    passed     64.02%
+  82  81     0.00%    passed    100.00%
+  83  82    31.89%    passed     99.20%
+  84  83     0.00%    passed    100.00%
+  85  84     0.00%    passed    100.00%
+  86  85     1.89%    passed    100.00%
+  87  86     0.00%    passed    100.00%
+  88  87     0.00%    passed    100.00%
+  89  88     0.00%    passed    100.00%
+  90  89     0.00%    passed     99.99%
+  91  90     0.00%    passed    100.00%
+  92  91     0.27%    passed     99.97%
+  93  92    14.32%    passed    100.00%
+  94  93     0.00%    passed     99.96%
+  95  94     1.89%    passed     99.99%
+  96  95     0.00%    passed     94.47%
+  97  96     0.81%    passed    100.00%
+  98  97     0.00%    passed     99.99%
+  99  98     0.00%    passed    100.00%
+ 100  99     0.00%    passed     99.88%
+ 101  100    0.00%    passed    100.00%
+ 102  101    0.00%    passed    100.00%
+ 103  102    0.00%    passed    100.00%
+ 104  103    0.00%    passed    100.00%
+ 105  104    0.00%    passed    100.00%
+ 106  105    0.00%    passed    100.00%
+ 107  106    0.00%    passed    100.00%
+ 108  107   56.49%    passed     95.84%
+ 109  108    0.00%    passed    100.00%
+ 110  109    0.27%    passed     99.89%
+ 111  110    0.00%    passed    100.00%
+ 112  111    0.00%    passed     99.99%
+ 113  112    0.00%    passed    100.00%
+ 114  113    0.00%    passed     92.91%
+ 115  114    0.00%    passed    100.00%
+ 116  115    0.00%    passed    100.00%
+ 117  116   58.92%    passed     97.18%
+ 118  117    0.00%    passed     99.99%
+ 119  118    0.00%    passed    100.00%
+ 120  119    0.54%    passed    100.00%
+ 121  120   34.32%    passed     99.71%
+ 122  121   55.95%    passed     98.71%
+ 123  122    2.97%    failed      1.71%
+ 124  123    0.00%    passed    100.00%
+ 125  124   36.76%    passed     99.38%
+ 126  125    0.00%    passed    100.00%
+ 127  126    0.00%    passed     35.81%
+ 128  127    0.00%    passed     95.51%
+ 129  128    0.00%    passed    100.00%
+ 130  129   15.95%    passed     99.42%
+ 131  130   66.76%    passed     63.76%
+ 132  131    0.00%    passed    100.00%
+ 133  132    0.00%    passed     46.35%
+ 134  133    0.00%    passed    100.00%
+ 135  134    0.00%    passed     99.99%
+ 136  135    0.00%    passed     99.74%
+ 137  136    0.00%    passed     99.94%
+ 138  137    0.00%    passed    100.00%
+ 139  138    0.00%    passed     92.24%
+ 140  139    0.00%    passed     99.97%
+ 141  140    0.00%    passed    100.00%
+ 142  141   76.49%    passed     64.02%
+ 143  142    3.78%    passed    100.00%
+ 144  143    0.00%    passed     99.94%
+ 145  144   52.43%    passed     57.30%
+ 146  145   28.65%    passed     36.53%
+ 147  146    0.00%    passed     52.71%
+ 148  147   53.24%    passed     93.90%
+ 149  148    0.00%    passed    100.00%
+ 150  149    0.00%    passed     99.96%
+ 151  150    0.00%    passed    100.00%
+ 152  151    0.00%    passed    100.00%
+ 153  152    0.00%    passed     94.23%
+ 154  153    0.00%    passed    100.00%
+ 155  154   49.46%    passed     92.05%
+ 156  155    0.00%    passed    100.00%
+ 157  156    0.00%    passed    100.00%
+ 158  157    0.00%    passed    100.00%
+ 159  158    0.00%    passed    100.00%
+ 160  159    0.00%    passed    100.00%
+ 161  160    0.00%    passed    100.00%
+ 162  161   17.03%    passed     99.94%
+ 163  162    0.00%    passed    100.00%
+ 164  163    0.00%    passed    100.00%
+ 165  164    0.00%    passed    100.00%
+ 166  165    4.86%    passed     99.98%
+ 167  166   15.14%    passed     99.99%
+ 168  167    0.00%    passed    100.00%
+ 169  168    1.35%    passed    100.00%
+ 170  169    0.00%    passed     99.99%
+ 171  170   51.08%    passed     88.90%
+ 172  171   55.95%    passed     92.85%
+ 173  172    0.00%    passed    100.00%
+ 174  173    0.00%    passed     50.09%
+ 175  174    0.00%    passed    100.00%
+ 176  175    0.54%    passed     99.99%
+ 177  176    0.00%    passed    100.00%
+ 178  177    0.00%    passed    100.00%
+ 179  178    0.00%    passed    100.00%
+ 180  179    0.00%    passed    100.00%
+ 181  180   14.59%    passed    100.00%
+ 182  181    0.00%    passed    100.00%
+ 183  182    0.00%    passed     99.99%
+ 184  183    0.00%    passed    100.00%
+ 185  184   39.19%    passed     98.61%
+ 186  185    0.00%    passed    100.00%
+ 187  186    0.00%    passed    100.00%
+ 188  187   19.73%    passed     99.56%
+ 189  188    0.00%    passed    100.00%
+ 190  189    1.35%    passed    100.00%
+ 191  190    0.00%    passed    100.00%
+ 192  191   48.11%    passed     99.08%
+ 193  192    0.00%    passed    100.00%
+ 194  193    0.00%    passed    100.00%
+ 195  194    0.00%    passed     99.50%
+ 196  195    0.00%    passed    100.00%
+ 197  196    0.00%    passed    100.00%
+ 198  197    0.00%    passed    100.00%
+ 199  198    0.00%    passed    100.00%
+ 200  199    0.27%    passed     99.98%
+ 201  200    0.00%    passed    100.00%
+ 202  201    0.00%    passed    100.00%
+ 203  202    0.00%    passed    100.00%
+ 204  203    0.00%    passed     99.99%
+ 205  204    0.00%    passed    100.00%
+ 206  205   61.08%    passed     93.62%
+ 207  206   64.59%    passed     75.20%
+ 208  207    0.00%    passed    100.00%
+ 209  208    0.54%    passed    100.00%
+ 210  209    0.00%    passed     89.76%
+ 211  210    0.00%    passed     99.99%
+ 212  211    0.00%    passed    100.00%
+ 213  212   12.43%    passed     95.26%
+ 214  213    0.00%    passed    100.00%
+ 215  214    0.00%    passed     99.92%
+ 216  215    0.00%    passed    100.00%
+ 217  216   28.65%    passed     96.64%
+ 218  217    0.00%    passed    100.00%
+ 219  218    0.00%    passed     99.41%
+ 220  219    0.00%    passed     99.99%
+ 221  220    0.00%    passed     99.99%
+ 222  221   34.86%    passed     99.62%
+ 223  222    0.00%    passed    100.00%
+ 224  223    0.00%    passed    100.00%
+ 225  224    0.00%    passed    100.00%
+ 226  225    0.00%    passed    100.00%
+ 227  226   19.19%    passed     99.98%
+ 228  227    0.00%    passed    100.00%
+ 229  228   12.16%    passed     99.84%
+ 230  229   29.19%    passed     97.11%
+ 231  230   70.81%    passed     81.53%
+ 232  231    0.00%    passed    100.00%
+ 233  232    0.00%    passed     99.98%
+ 234  233    0.00%    passed     99.96%
+ 235  234    0.00%    passed    100.00%
+ 236  235    4.59%    passed    100.00%
+ 237  236    0.00%    passed    100.00%
+ 238  237    0.00%    passed     98.34%
+ 239  238    0.00%    passed     94.23%
+ 240  239    0.00%    passed    100.00%
+ 241  240    0.00%    passed    100.00%
+ 242  241    0.00%    passed    100.00%
+ 243  242    0.00%    passed    100.00%
+ 244  243    0.00%    passed     98.87%
+ 245  244   52.97%    passed     88.66%
+ 246  245    0.00%    passed    100.00%
+ 247  246    0.00%    failed      1.27%
+ 248  247   12.70%    passed    100.00%
+ 249  248    0.00%    passed    100.00%
+ 250  249    0.00%    passed     99.72%
+ 251  250   41.35%    passed     97.19%
+ 252  251   49.46%    passed     92.05%
+ 253  252    0.00%    passed    100.00%
+ 254  253    0.00%    passed    100.00%
+ 255  254    0.00%    passed    100.00%
+ 256  255    0.00%    passed    100.00%
+ 257  256   74.86%    passed     14.53%
+ 258  257    1.08%    passed    100.00%
+ 259  258    0.00%    passed     81.02%
+ 260  259    0.00%    passed    100.00%
+ 261  260   77.84%    passed     57.35%
+ 262  261    0.00%    passed    100.00%
+ 263  262    9.46%    passed     99.96%
+ 264  263    0.00%    passed     99.99%
+ 265  264    0.00%    passed    100.00%
+ 266  265    0.00%    passed    100.00%
+ 267  266   48.11%    passed     93.22%
+ 268  267    0.00%    passed    100.00%
+ 269  268    0.00%    passed    100.00%
+ 270  269    0.00%    passed    100.00%
+ 271  270    0.00%    passed    100.00%
+ 272  271    0.00%    passed    100.00%
+ 273  272    0.00%    passed    100.00%
+ 274  273    0.00%    passed     96.69%
+ 275  274    0.00%    passed    100.00%
+ 276  275    0.00%    passed     99.86%
+ 277  276    6.22%    passed    100.00%
+ 278  277    0.00%    passed    100.00%
+ 279  278    0.00%    passed     65.05%
+ 280  279    0.00%    passed     99.96%
+ 281  280    0.81%    passed    100.00%
+ 282  281   42.16%    passed     99.78%
+ 283  282    0.00%    passed     99.97%
+ 284  283    0.00%    passed    100.00%
+ 285  284   55.95%    passed     99.92%
+WARNING: 20 sequences contain more than 50% gaps/ambiguity
+****  TOTAL    8.28%  2 sequences failed composition chi2 test (p-value<5%; df=19)
+
+Reading site-specific state frequency file example1.gbtrim.freq ...
+Regrouping alignment sites...
+370 distinct per-site state frequency vectors detected
+NOTE: 36 is identical to 0 but kept for subsequent analysis
+NOTE: 112 is identical to 39 but kept for subsequent analysis
+NOTE: 227 is identical to 40 but kept for subsequent analysis
+NOTE: 69 is identical to 42 but kept for subsequent analysis
+NOTE: 86 is identical to 74 but kept for subsequent analysis
+NOTE: 115 is identical to 81 but kept for subsequent analysis
+NOTE: 233 is identical to 93 but kept for subsequent analysis
+NOTE: 283 is identical to 100 but kept for subsequent analysis
+NOTE: 190 is identical to 104 but kept for subsequent analysis
+NOTE: 238 is identical to 152 but kept for subsequent analysis
+NOTE: 251 is identical to 154 but kept for subsequent analysis
+NOTE: 192 is identical to 174 but kept for subsequent analysis
+NOTE: 240 is identical to 239 but kept for subsequent analysis
+NOTE: 9 identical sequences (see below) will be ignored for subsequent analysis
+NOTE: 197 (identical to 0) is ignored but added at the end
+NOTE: 222 (identical to 0) is ignored but added at the end
+NOTE: 223 (identical to 0) is ignored but added at the end
+NOTE: 178 (identical to 39) is ignored but added at the end
+NOTE: 277 (identical to 39) is ignored but added at the end
+NOTE: 234 (identical to 40) is ignored but added at the end
+NOTE: 193 (identical to 42) is ignored but added at the end
+NOTE: 242 (identical to 74) is ignored but added at the end
+NOTE: 215 (identical to 81) is ignored but added at the end
+
+For your convenience alignment with unique sequences printed to example1.gbtrim.uniqueseq.phy
+
+Create initial parsimony tree by phylogenetic likelihood library (PLL)... 0.098 seconds
+Model LG+C20+F+G is alias for LG+POISSON+G+FMIX{C20pi1:1:0.0559910600,C20pi2:1:0.0514824870,C20pi3:1:0.0812922124,C20pi4:1:0.0721976867,C20pi5:1:0.0556718858,C20pi6:1:0.0331003080,C20pi7:1:0.0589501763,C20pi8:1:0.0263756889,C20pi9:1:0.0307584220,C20pi10:1:0.0376701125,C20pi11:1:0.0303058290,C20pi12:1:0.0808775576,C20pi13:1:0.0263349134,C20pi14:1:0.0579101455,C20pi15:1:0.0371248064,C20pi16:1:0.0586867766,C20pi17:1:0.0561479138,C20pi18:1:0.0349810886,C20pi19:1:0.0544937394,C20pi20:1:0.0596471901}+F+G
+
+NOTE: 1390 MB RAM (1 GB) is required!
+Estimate model parameters (epsilon = 0.100)
+1. Initial log-likelihood: -23330.697
+2. Current log-likelihood: -22823.528
+3. Current log-likelihood: -22807.033
+4. Current log-likelihood: -22803.871
+5. Current log-likelihood: -22803.261
+Optimal log-likelihood: -22803.141
+Mixture weights: 0.142 0.046 0.081 0.053 0.031 0.049 0.000 0.021 0.058 0.045 0.004 0.083 0.062 0.044 0.096 0.022 0.025 0.033 0.049 0.000 0.055
+Gamma shape alpha: 0.604
+Parameters optimization took 5 rounds (82.207 sec)
+WARNING: The mixture model might be overfitting because some mixture weights are estimated close to zero
+Computing ML distances based on estimated model parameters... 17.297 sec
+WARNING: Some pairwise ML distances are too long (saturated)
+Computing BIONJ tree...
+0.086 seconds
+Log-likelihood of BIONJ tree: -23126.238
+--------------------------------------------------------------------
+|             INITIALIZING CANDIDATE TREE SET                      |
+--------------------------------------------------------------------
+Generating 98 parsimony trees... 9.764 second
+Computing log-likelihood of 98 initial trees ... 718.671 seconds
+Current best score: -22673.297
+
+Do NNI search on 20 best initial trees
+Estimate model parameters (epsilon = 0.100)
+WARNING: The mixture model might be overfitting because some mixture weights are estimated close to zero
+BETTER TREE FOUND at iteration 1: -22572.352
+Iteration 10 / LogL: -22602.052 / Time: 0h:51m:7s
+Iteration 20 / LogL: -22599.722 / Time: 1h:23m:15s
+Finish initializing candidate tree set (20)
+Current best tree score: -22572.352 / CPU time: 4858.292
+Number of iterations: 20
+--------------------------------------------------------------------
+|               OPTIMIZING CANDIDATE TREE SET                      |
+--------------------------------------------------------------------
+Estimate model parameters (epsilon = 0.100)
+WARNING: The mixture model might be overfitting because some mixture weights are estimated close to zero
+BETTER TREE FOUND at iteration 21: -22563.791
+Estimate model parameters (epsilon = 0.100)
+WARNING: The mixture model might be overfitting because some mixture weights are estimated close to zero
+BETTER TREE FOUND at iteration 25: -22560.844
+Estimate model parameters (epsilon = 0.100)
+WARNING: The mixture model might be overfitting because some mixture weights are estimated close to zero
+BETTER TREE FOUND at iteration 30: -22556.487
+Iteration 30 / LogL: -22556.487 / Time: 1h:44m:27s (6h:0m:12s left)
+Estimate model parameters (epsilon = 0.100)
+WARNING: The mixture model might be overfitting because some mixture weights are estimated close to zero
+BETTER TREE FOUND at iteration 36: -22552.533
+Estimate model parameters (epsilon = 0.100)
+WARNING: The mixture model might be overfitting because some mixture weights are estimated close to zero
+BETTER TREE FOUND at iteration 40: -22544.859
+Iteration 40 / LogL: -22544.859 / Time: 2h:8m:22s (5h:29m:10s left)
+Estimate model parameters (epsilon = 0.100)
+WARNING: The mixture model might be overfitting because some mixture weights are estimated close to zero
+BETTER TREE FOUND at iteration 42: -22544.661
+Estimate model parameters (epsilon = 0.100)
+WARNING: The mixture model might be overfitting because some mixture weights are estimated close to zero
+BETTER TREE FOUND at iteration 44: -22540.656
+Iteration 50 / LogL: -22551.167 / Time: 2h:32m:5s (4h:51m:46s left)
+Estimate model parameters (epsilon = 0.100)
+WARNING: The mixture model might be overfitting because some mixture weights are estimated close to zero
+BETTER TREE FOUND at iteration 51: -22525.606
+Estimate model parameters (epsilon = 0.100)
+WARNING: The mixture model might be overfitting because some mixture weights are estimated close to zero
+BETTER TREE FOUND at iteration 55: -22523.425
+Estimate model parameters (epsilon = 0.100)
+WARNING: The mixture model might be overfitting because some mixture weights are estimated close to zero
+BETTER TREE FOUND at iteration 56: -22511.158
+Iteration 60 / LogL: -22535.554 / Time: 2h:57m:35s (4h:48m:57s left)
+Estimate model parameters (epsilon = 0.100)
+WARNING: The mixture model might be overfitting because some mixture weights are estimated close to zero
+BETTER TREE FOUND at iteration 65: -22510.067
+Estimate model parameters (epsilon = 0.100)
+WARNING: The mixture model might be overfitting because some mixture weights are estimated close to zero
+BETTER TREE FOUND at iteration 68: -22501.162
+Estimate model parameters (epsilon = 0.100)
+WARNING: The mixture model might be overfitting because some mixture weights are estimated close to zero
+BETTER TREE FOUND at iteration 69: -22501.028
+Iteration 70 / LogL: -22526.116 / Time: 3h:20m:51s (4h:48m:10s left)
+Iteration 80 / LogL: -22546.164 / Time: 3h:42m:22s (4h:10m:31s left)
+Estimate model parameters (epsilon = 0.100)
+WARNING: The mixture model might be overfitting because some mixture weights are estimated close to zero
+BETTER TREE FOUND at iteration 86: -22498.105
+Iteration 90 / LogL: -22507.674 / Time: 4h:3m:51s (4h:23m:2s left)
+Iteration 100 / LogL: -22544.554 / Time: 4h:24m:57s (3h:50m:9s left)
+Iteration 110 / LogL: -22506.620 / Time: 4h:45m:38s (3h:19m:9s left)
+Iteration 120 / LogL: -22639.959 / Time: 5h:7m:48s (2h:50m:42s left)
+Iteration 130 / LogL: -22503.629 / Time: 5h:28m:26s (2h:22m:34s left)
+Iteration 140 / LogL: -22521.209 / Time: 5h:49m:0s (1h:55m:30s left)
+Estimate model parameters (epsilon = 0.100)
+WARNING: The mixture model might be overfitting because some mixture weights are estimated close to zero
+BETTER TREE FOUND at iteration 144: -22496.294
+Iteration 150 / LogL: -22539.084 / Time: 6h:11m:11s (3h:54m:10s left)
+Estimate model parameters (epsilon = 0.100)
+WARNING: The mixture model might be overfitting because some mixture weights are estimated close to zero
+BETTER TREE FOUND at iteration 152: -22495.644
+Estimate model parameters (epsilon = 0.100)
+WARNING: The mixture model might be overfitting because some mixture weights are estimated close to zero
+BETTER TREE FOUND at iteration 154: -22494.183
+Estimate model parameters (epsilon = 0.100)
+WARNING: The mixture model might be overfitting because some mixture weights are estimated close to zero
+BETTER TREE FOUND at iteration 155: -22493.636
+Estimate model parameters (epsilon = 0.100)
+WARNING: The mixture model might be overfitting because some mixture weights are estimated close to zero
+BETTER TREE FOUND at iteration 158: -22490.977
+Estimate model parameters (epsilon = 0.100)
+WARNING: The mixture model might be overfitting because some mixture weights are estimated close to zero
+BETTER TREE FOUND at iteration 159: -22489.699
+Iteration 160 / LogL: -22500.922 / Time: 6h:32m:29s (4h:4m:22s left)
+Iteration 170 / LogL: -22493.748 / Time: 6h:53m:6s (3h:37m:33s left)
+Estimate model parameters (epsilon = 0.100)
+WARNING: The mixture model might be overfitting because some mixture weights are estimated close to zero
+BETTER TREE FOUND at iteration 177: -22486.169
+Iteration 180 / LogL: -22532.706 / Time: 7h:15m:15s (3h:55m:52s left)
+Iteration 190 / LogL: -22498.108 / Time: 7h:34m:41s (3h:29m:17s left)
+Iteration 200 / LogL: -22542.313 / Time: 7h:54m:52s (3h:3m:44s left)
+Estimate model parameters (epsilon = 0.100)
+WARNING: The mixture model might be overfitting because some mixture weights are estimated close to zero
+BETTER TREE FOUND at iteration 202: -22485.738
+Iteration 210 / LogL: -22507.220 / Time: 8h:15m:23s (3h:38m:3s left)
+Estimate model parameters (epsilon = 0.100)
+WARNING: The mixture model might be overfitting because some mixture weights are estimated close to zero
+BETTER TREE FOUND at iteration 214: -22481.628
+Iteration 220 / LogL: -22497.849 / Time: 8h:35m:48s (3h:41m:23s left)
+Iteration 230 / LogL: -22492.308 / Time: 8h:55m:29s (3h:16m:25s left)
+Estimate model parameters (epsilon = 0.100)
+WARNING: The mixture model might be overfitting because some mixture weights are estimated close to zero
+BETTER TREE FOUND at iteration 239: -22480.748
+Iteration 240 / LogL: -22490.791 / Time: 9h:16m:9s (3h:50m:22s left)
+Iteration 250 / LogL: -22507.103 / Time: 9h:36m:13s (3h:25m:57s left)
+Estimate model parameters (epsilon = 0.100)
+WARNING: The mixture model might be overfitting because some mixture weights are estimated close to zero
+BETTER TREE FOUND at iteration 256: -22473.672
+Iteration 260 / LogL: -22490.039 / Time: 9h:56m:48s (3h:41m:12s left)
+Iteration 270 / LogL: -22476.837 / Time: 10h:16m:40s (3h:17m:9s left)
+Iteration 280 / LogL: -22496.056 / Time: 10h:35m:22s (2h:53m:4s left)
+Iteration 290 / LogL: -22499.668 / Time: 10h:55m:6s (2h:29m:36s left)
+Iteration 300 / LogL: -22511.660 / Time: 11h:15m:37s (2h:6m:32s left)
+Iteration 310 / LogL: -22488.306 / Time: 11h:36m:30s (1h:43m:41s left)
+Iteration 320 / LogL: -22476.454 / Time: 11h:56m:8s (1h:20m:49s left)
+Iteration 330 / LogL: -22486.092 / Time: 12h:15m:4s (0h:58m:5s left)
+Iteration 340 / LogL: -22475.740 / Time: 12h:35m:0s (0h:35m:38s left)
+Iteration 350 / LogL: -22482.052 / Time: 12h:53m:58s (0h:13m:18s left)
+Estimate model parameters (epsilon = 0.100)
+WARNING: The mixture model might be overfitting because some mixture weights are estimated close to zero
+BETTER TREE FOUND at iteration 354: -22472.763
+Iteration 360 / LogL: -22493.566 / Time: 13h:14m:18s (3h:27m:58s left)
+Iteration 370 / LogL: -22477.882 / Time: 13h:33m:58s (3h:5m:17s left)
+Iteration 380 / LogL: -22486.363 / Time: 13h:55m:13s (2h:43m:4s left)
+Iteration 390 / LogL: -22487.973 / Time: 14h:15m:28s (2h:20m:44s left)
+Iteration 400 / LogL: -22504.964 / Time: 14h:35m:39s (1h:58m:30s left)
+Iteration 410 / LogL: -22490.160 / Time: 14h:56m:3s (1h:36m:23s left)
+Iteration 420 / LogL: -22475.544 / Time: 15h:16m:0s (1h:14m:19s left)
+Iteration 430 / LogL: -22508.286 / Time: 15h:37m:13s (0h:52m:25s left)
+Iteration 440 / LogL: -22477.485 / Time: 15h:57m:32s (0h:30m:32s left)
+Iteration 450 / LogL: -22496.397 / Time: 16h:18m:42s (0h:8m:43s left)
+TREE SEARCH COMPLETED AFTER 455 ITERATIONS / Time: 16h:28m:57s
+
+--------------------------------------------------------------------
+|                    FINALIZING TREE SEARCH                        |
+--------------------------------------------------------------------
+Performs final model parameters optimization
+Estimate model parameters (epsilon = 0.010)
+1. Initial log-likelihood: -22472.763
+Optimal log-likelihood: -22472.762
+Mixture weights: 0.125 0.042 0.067 0.055 0.031 0.048 0.000 0.024 0.065 0.043 0.006 0.080 0.065 0.053 0.098 0.023 0.025 0.031 0.066 0.000 0.055
+Gamma shape alpha: 0.587
+Parameters optimization took 1 rounds (9.950 sec)
+WARNING: The mixture model might be overfitting because some mixture weights are estimated close to zero
+BEST SCORE FOUND : -22472.762
+Total tree length: 33.767
+
+Total number of iterations: 455
+CPU time used for tree search: 231140.672 sec (64h:12m:20s)
+Wall-clock time used for tree search: 59199.363 sec (16h:26m:39s)
+Total CPU time used: 231709.703 sec (64h:21m:49s)
+Total wall-clock time used: 59347.013 sec (16h:29m:7s)
+
+Analysis results written to: 
+  IQ-TREE report:                example1.gbtrim.iqtree
+  Maximum-likelihood tree:       example1.gbtrim.treefile
+  Likelihood distances:          example1.gbtrim.mldist
+  Screen log file:               example1.gbtrim.log
+
+Date and Time: Fri Sep 20 08:29:19 2019
