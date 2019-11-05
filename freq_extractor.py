@@ -10,6 +10,7 @@ from Bio import AlignIO, SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from shutil import copyfile
+import collections
 
 __copyright__ = """
   ################################################################################################
@@ -228,9 +229,6 @@ def ali_parser(alignment_file):
         j += 1
 
 
-    #nuse_seq_score = np.sum(array_score, axis=1)
-    #print seq_score
-    #print nuse_seq_score
     #obtaining seed_seq related info
     seed_seq_array = raw_array[np.argmax(seq_score)]
     seed_seq = "".join(seed_seq_array)
@@ -256,7 +254,7 @@ def ali_parser(alignment_file):
     SeqIO.write(seed_seq_record, args.output_path+"temp_seed_seq.fasta", "fasta")
     
     # run hmmscan
-    subprocess.check_output([hmmscan_exe, '-o', args.output_path+'temp_hmmscan.out', args.database, args.output_path+'temp_seed_seq.fasta'])
+    subprocess.check_output([hmmscan_exe, '-o', args.output_path+'temp_hmmscan.out', '-E', '1e-20' ,'--domE','1e-20', args.database, args.output_path+'temp_seed_seq.fasta'])
 
     return (seed_seq_record, seed_to_ali_mapping)
    
@@ -269,14 +267,17 @@ def hmmscan_parser(out_file, qurey_id):
             #print QueryResult.description
             for hit in QueryResult.hits:  # TO-DO: need to control for multiple hits, comparing e-values?
                 domain_info[hit.id] = []
+
                 for HSPFragments in hit.hsps:  # multiple domains
-                  
+
+                    domain_hit_score =HSPFragments.bitscore
                     query_hit_start = HSPFragments.query_start+1 # parsed start position appears to be 1 site short
                     query_hit_seq = HSPFragments.query.seq
                     query_hit_end = HSPFragments.query_end
                     domain_hit_start = HSPFragments.hit_start+1
                     domain_hit_end = HSPFragments.hit_end
-                    domain_info[hit.id].append([query_hit_start, query_hit_end, query_hit_seq, domain_hit_start, domain_hit_end])
+                    domain_info[hit.id].append([domain_hit_score, query_hit_end, query_hit_seq, domain_hit_start, domain_hit_end,query_hit_start])
+                    
 	
 	return domain_info
 
@@ -291,6 +292,25 @@ def add_default_model(alignment,default_model):
             freq=str(default_model) 
             alignment[pos]=str(default_model)
     return alignment
+
+def check_domain_position(start,end,lists):
+    flag=0
+    if start==0 and end==0:
+        return False
+    while start<=end:
+        if lists[start]==1:
+            flag=1
+            return False
+
+        start+=1
+    return True
+
+def set_domain_position(start, end, lists):
+
+    while start<=end:
+        lists[start]=1
+        start+=1
+    return lists
 ###################################################################################
 ###############################   MAIN PROCESSES   ################################
 ###################################################################################
@@ -298,30 +318,19 @@ def add_default_model(alignment,default_model):
 seed_seq, seed_to_ali_mapping = ali_parser(args.ali)[0], ali_parser(args.ali)[1]
 domains = hmmscan_parser(args.output_path+'temp_hmmscan.out', seed_seq.id)
 hmm_database = {}
-'''
-highest_key=""
-get_the_highest_key=0
-for key, value in domains.iteritems():
-    #print  value
-    if get_the_highest_key==0:
-        highest_domain={key:value}
-        highest_key=key
-        get_the_highest_key=1
-   # if domains[key]!=domains.keys()[-1]:
-   #     del domains[key]
-    
 
-print highest_key
-'''
 for key, value in domains.iteritems():
 #hmm_database = HMM(args.database, seed_seq.id).hmm_database  # Storing target hmm profile into a HMM Class which is structured as a dictionary
-   
+    
     hmm_database = HMM(args.database, key,hmm_database )
 
 alimentObj = AlignIO.read(args.ali, "fasta")
+aligmentObjLen=len(alimentObj[0])
+local_seed_seq_master = [[]]*(aligmentObjLen+int(0.1*aligmentObjLen))
+max_seed_seq_master = [[]]*aligmentObjLen
 
-seed_seq_master = [[]]*len(alimentObj[0])  #The master list storing aa_freqs for the entire seed_seq
-
+seed_seq_master = [[]]*(aligmentObjLen+int(0.1*aligmentObjLen)) #The master list storing aa_freqs for the entire seed_seq
+domain_position_check=[0 for x in range(aligmentObjLen)]
 
 ##### LET HMM_database order as score
 '''
@@ -334,27 +343,30 @@ for i in dom_key[::-1]:
     print i
 #print domains_order
 '''
-
+higheststart=0
+highestend=0
 
 seq_start_end_list = []
 #Getting the aa_freqs from respective hmms, storing structure see HMM.py
-#for hmm_name, hits in sorted(domains.items(), key=operator.itemgetter([1][0])):  #The aa_seqs should be recorded in from the N-terminal to C-terminal of the seed seq
-for hmm_name, hits in (domains.items()):
-    #print hmm_database[hmm_name]
-    print hmm_name
+for hmm_name, hits in sorted(domains.items(), key=operator.itemgetter([1][0]),reverse=True):  #The aa_seqs should be recorded in from the N-terminal to C-terminal of the seed seq
 
+       
+    highestscore=0
     if hmm_database[hmm_name] is not None:
         for hit_info in hits:    
-            seed_seq_m_start = int(hit_info[0])  #Seed seq match start
+            seed_seq_m_start = int(hit_info[5])  #Seed seq match start
+            score=float(hit_info[0])
             seq_count=seed_seq_m_start
-            seq_start_end_list.append(seed_seq_m_start)
+            
+
             seed_seq_m_end = int(hit_info[1])  #Seed seq match end
-            seq_start_end_list.append(seed_seq_m_end)
+           
             dm_seed_seq = str(hit_info[2])  #Domain matching seed seq
             dm_start = int(hit_info[3])  #Doamin match start
             dm_end = int(hit_info[4])  #Doamin match end
             # Mapping the aa_freqs to seed_seq sites according to the hmmscan output
             hmmscan_seed_seq = list(dm_seed_seq)  #A list storing dm_seed_seq site-by-site
+
             j = 0  #Check for insert state so the pointer maps correctly to the domain position
             for i, seed_seq_site in enumerate(hmmscan_seed_seq):
                 
@@ -413,19 +425,32 @@ for hmm_name, hits in (domains.items()):
                     print "Something is not right!!!"
                     break
 
-
-                if  seed_seq_master[seq_count]:
+                                
+                if  local_seed_seq_master[seq_count]:
                     pass
                 else:
-                    seed_seq_master[seq_count]= hmmscan_seed_seq[i]
+
+                    local_seed_seq_master[seq_count]= hmmscan_seed_seq[i]
                 seq_count+=1
             #seed_seq_master += hmmscan_seed_seq
+            if score>highestscore:
+                highestscore=score
+                max_seed_seq_master=local_seed_seq_master
+                higheststart= seed_seq_m_start
+                highestend=seed_seq_m_end
 
 
 
+    if check_domain_position(higheststart, highestend,domain_position_check):
 
+        domain_position_check=set_domain_position(higheststart, highestend,domain_position_check)
+        seq_start_end_list.append(higheststart)
+        seq_start_end_list.append(highestend)
+        while higheststart<=highestend:
+            seed_seq_master[higheststart]=max_seed_seq_master[higheststart]
+            higheststart+=1
 
-
+        
 
 
     else:
@@ -453,6 +478,7 @@ for i in range(0,len(seq_start_end_list),2):
     while seed_seq_m_start <= seed_seq_m_end:
         seed_to_ali_mapping = [seed_seq_master[seed_seq_m_start] if x == seed_seq_m_start else x for x in seed_to_ali_mapping]
         seed_seq_m_start += 1
+  
 
 '''
 while seed_seq_m_start <= seed_seq_m_end:
@@ -470,9 +496,11 @@ full_ali_obj = AlignIO.read(args.ali, "fasta")  # have to read the original alig
 # Make seq names shorter so Gblocks is happy (<= 15 characters, I think...)
 i = 0
 full_ali_seq_des = []  # getting sequence descriptions for restoring to the original descriptions after Gblocks trimming
+alignment_name = []
 for record in full_ali_obj:
+    alignment_name.append(record.id)
     record.id = str(i)
-    full_ali_seq_des.append(record.description)
+    #full_ali_seq_des.append(record.description)
     record.description = ""
     i += 1
 
@@ -488,11 +516,14 @@ print "-------------------------------------------------------------------------
 
 
 gbtrim_ali_obj = AlignIO.read(args.output_path+args.file_name+".temp_gb-gb", "fasta")
+
 i = 0
 for record in gbtrim_ali_obj:
-    record.description = full_ali_seq_des[0]
-    gbtrim_len=len(record)
-    gbt_ali=record
+    record.id = alignment_name[i]
+    #record.description = full_ali_seq_des[i]
+    #gbtrim_len=len(record)
+    #gbt_ali=record
+    record.description = ""
     i += 1
 
 for r in full_ali_obj:
@@ -521,6 +552,7 @@ match_count=0
 for pos, aa_freq in enumerate(seed_to_ali_mapping):
     if type(aa_freq) is str:
         aa_freqs_output_file_hmmtrim.write(str(hmmtrim_iqtree_site_pos)+" "+aa_freq+"\n")
+        
         hmmtrim_iqtree_site_pos += 1
         hmmtrim_ali_obj = hmmtrim_ali_obj[:,:] + full_ali_obj[:,pos-1:pos]
 
@@ -534,6 +566,7 @@ seed_to_ali_mapping=add_default_model(seed_to_ali_mapping,LG_MODEL)
 for pos, aa_freq in enumerate(seed_to_ali_mapping):
     if type(aa_freq) is str:  # hmm_profile mapped
             aa_freqs_output_file.write(str(pos+1)+" "+aa_freq+"\n")
+            
             #aa_freqs_output_file_hmmtrim.write(str(hmmtrim_iqtree_site_pos)+" "+aa_freq+"\n")
             #hmmtrim_iqtree_site_pos += 1
             #hmmtrim_ali_obj = hmmtrim_ali_obj[:,:] + full_ali_obj[:,pos-1:pos]
@@ -550,37 +583,22 @@ for pos, aa_freq in enumerate(seed_to_ali_mapping):
                         #print "\n"+str(pos)+"\t"+str(gbtrim_iqtree_site_pos)
                         #print full_ali_col_array[pos].tolist()
                         aa_freqs_output_file_gbtrim.write(str(match_count)+" "+str(aa_freq)+"\n")
+                        
                     
                         break
                     gbtrim_iqtree_site_pos=gbtrim_iqtree_site_pos+1    
 
 
 
-                '''
-
-                    ###previous write gbrim_freq########3
-
-            
-                #aa_test_full_array.write(str(pos)+":  "+str(full_ali_col_array[pos])+"\n")
-                
-                if full_ali_col_array[pos].tolist() == gbtrim_ali_col_array[gbtrim_iqtree_site_pos-1].tolist():     
-                               
-                    aa_freqs_output_file_gbtrim.write(str(gbtrim_iqtree_site_pos)+" "+aa_freq+"\n")
-                    gbtrim_iqtree_site_pos += 1
-                '''
             except IndexError:  # capture the IndexError when gbtrim positions are running out, so the rest of processes can continue
                continue
 
        
             
-    #else:
-         
-            #aa_freqs_output_file.write(str(pos+1)+" "+"NA\n")
-           
- 
-
+i=0
 for record in hmmtrim_ali_obj:
-    record.description = full_ali_seq_des[0]
+    record.id = alignment_name[i]
+    
     i += 1
 
 AlignIO.write(hmmtrim_ali_obj, args.output_path+args.file_name+".hmmtrim", "fasta")
@@ -592,40 +610,15 @@ aa_freqs_output_file_gbtrim.close()
 
 print '\nFull alignment:\t\t%s\nHMM_profile mapped alignment:\t%s\nGblock trimmed alignment:\t%s' % (args.output_path+args.file_name+".freq", args.output_path+args.file_name+".hmmtrim.freq", args.output_path+args.file_name+".gbtrim.freq")
 
-'''
-#run IQ-TREE
-print"executing iqtree ..."
-print"runing gbtrim iqtree\n"
-if not os.path.isdir(args.output_path+"gbtrim_iqtree"):
-    os.mkdir(args.output_path+"gbtrim_iqtree", 0777)
-
-#gbtrim iqtree
-copyfile(args.output_path+args.file_name+".gbtrim",args.output_path+"gbtrim_iqtree/"+args.file_name+".gbtrim")
-copyfile(args.output_path+args.file_name+".gbtrim.freq",args.output_path+"gbtrim_iqtree/"+args.file_name+".gbtrim.freq")
-
-subprocess.Popen([iqtree_exe,"-nt","4", "-s",args.file_name+".gbtrim", "-m", "LG+C20+F+G", "-fs",args.file_name+".gbtrim.freq"],cwd=(args.output_path+"gbtrim_iqtree"))
-
-print" runing hmmtrim iqtree\n"
-if not os.path.isdir(args.output_path+"hmmtrim_iqtree"):
-    os.mkdir(args.output_path+"hmmtrim_iqtree", 0777)
-#hmmtrim iqtree
-
-copyfile(args.output_path+args.file_name+".hmmtrim",args.output_path+"hmmtrim_iqtree/"+args.file_name+".hmmtrim")
-copyfile(args.output_path+args.file_name+".hmmtrim.freq",args.output_path+"hmmtrim_iqtree/"+args.file_name+".hmmtrim.freq")
-
-subprocess.Popen([iqtree_exe,"-nt","4", "-s",args.file_name+".hmmtrim", "-m", "LG+C20+F+G", "-fs",args.file_name+".hmmtrim.freq"],cwd=(args.output_path+"hmmtrim_iqtree"))
-
-'''
 
 
-############full fredom iqtree########
-'''
-if not os.path.isdir(args.output_path+"full_iqtree"):
-    os.mkdir(args.output_path+"full_iqtree", 0777)
-copyfile(args.ali,args.output_path+"full_iqtree/"+args.file_name+".fasta")
-copyfile(args.output_path+args.file_name+".freq",args.output_path+"full_iqtree/"+args.file_name+".freq")
 
-subprocess.Popen([iqtree_exe,"-nt","4", "-s",args.file_name+".fasta", "-m", "LG+C20+F+G", "-fs",args.file_name+".freq"],cwd=(args.output_path+"full_iqtree"))
-'''
+
+
+
+
+
+
+
 endtime=datetime.datetime.now()
 print "executive time:",(endtime-starttime).seconds ,"seconds"
