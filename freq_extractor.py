@@ -57,6 +57,8 @@ optional.add_argument('--file_name', help='output file name', default='dEfAuLt')
 optional.add_argument('--hmmer_path', help='HMMER executable directory', default='bin/')
 optional.add_argument('--gb_path', help='Gblocks executable directory', default='bin/')
 optional.add_argument('--iq_path', help='IQ-TREE executable directory', default='bin/')
+optional.add_argument('--seed_seq', help='--mode consensus (default) : a consensus sequence found by hmmemit with--symfra 0\
+    --mode representative : a representative single sequence with highest pairwise similarity', default='consensus')
 #optional.add_argument('--iqtree', action='store_true', help='flag to output frequency file in IQ-TREE supported format')
 args = parser.parse_args()  # e.g. input alignment file: args.ali; output freq_file: args.out
 # Demanding required input
@@ -65,8 +67,10 @@ if not (args.ali) or not (args.output_path) : parser.error(' Please provide nece
 # 3rd-party program directories
 hmmscan_exe = str(args.hmmer_path)+'hmmscan'
 hmmfetch_exe = str(args.hmmer_path)+'hmmfetch'
+hmmbuild_exe = str(args.hmmer_path)+'hmmbuild'
+hmmemit_exe = str(args.hmmer_path)+ 'hmmemit'
 gblocks_exe = str(args.gb_path)+'Gblocks'
-iqtree_exe="../../"+str(args.iq_path)+'iqtree'
+iqtree_exe=str(args.iq_path)+'iqtree'
 if args.file_name=='dEfAuLt':                   #change default output file into input alignment name
   args.file_name=((args.ali).split('/'))[-1]
 
@@ -189,73 +193,91 @@ def HMM( hmm_file, seed_seq_id,hmm_database):
 
 #Parse the hmmscan output file(s) and return the information needed for alignment-hmm sites mapping
 def ali_parser(alignment_file):
-    full_ali_obj = AlignIO.read(alignment_file, "fasta")
-    for record in full_ali_obj:
-        record.seq = str(record.seq).replace('X','-')  # in case of 'X', replacing it with '-'
     
-    raw_array = np.array([list(rec) for rec in full_ali_obj], np.character, order="F")  # Convert alignment object to np_array object
-    col_array = np.transpose(raw_array)  # align_columns.shape == (#col, #raw), i.e. (#site, #seq)
 
-    # compute the columne scores (as the proxy for seq coverage percentage)
-    col_scores = []
-    for col in col_array:
-        unique, counts = np.unique(col, return_counts=True)
-        if '-' in unique:
-            col_scores.append(1.0 - float(dict(zip(unique, counts))['-'])/float(len(col)))
+    # optional parameter  use score or hmmemit to choose seed sequence    #args.ali
+    if args.seed_seq == 'consensus':
+        
+        subprocess.check_output([hmmbuild_exe, '--symfrac', '0', args.output_path+args.file_name+'.hmm', args.ali])    
+        subprocess.check_output([hmmemit_exe, '-c', '-o', args.output_path+'temp_seed_seq.fasta', args.output_path+args.file_name+'.hmm'])
+        seed_seq_record = AlignIO.read(args.output_path+'temp_seed_seq.fasta', 'fasta')
+        seed_seq_record = str(seed_seq_record[0].seq)
+        seed_seq_record = SeqRecord(Seq(seed_seq_record), id=args.file_name+'-consensus')
 
-    # obtain the seq with the highest coverage in the alignment
-    array_score = np.copy(raw_array).astype(object)
+        seed_to_ali_mapping = [x+1 for x in range(len(seed_seq_record))]
 
-    j = 0  # seq count
-    while j < len(array_score):
-        i = 0  # col count
-        while i < len(col_scores):
-            if array_score[j][i] == '-': array_score[j][i] = 0.0
-            else:
-                array_score[j][i] = float(col_scores[i])
+
+    elif args.seed_seq == 'representative':
+
+        full_ali_obj = AlignIO.read(alignment_file, "fasta")
+        for record in full_ali_obj:
+            record.seq = str(record.seq).replace('X','-')  # in case of 'X', replacing it with '-'
+
+
+
+        raw_array = np.array([list(rec) for rec in full_ali_obj], np.character, order="F")  # Convert alignment object to np_array object
+        col_array = np.transpose(raw_array)  # align_columns.shape == (#col, #raw), i.e. (#site, #seq)
+
+        # compute the columne scores (as the proxy for seq coverage percentage)
+        col_scores = []
+        for col in col_array:
+            unique, counts = np.unique(col, return_counts=True)
+            if '-' in unique:
+                col_scores.append(1.0 - float(dict(zip(unique, counts))['-'])/float(len(col)))
+
+        # obtain the seq with the highest coverage in the alignment
+        array_score = np.copy(raw_array).astype(object)
+
+        j = 0  # seq count
+        while j < len(array_score):
+            i = 0  # col count
+            while i < len(col_scores):
+                if array_score[j][i] == '-': array_score[j][i] = 0.0
+                else:
+                    array_score[j][i] = float(col_scores[i])
             
-            i += 1
-        j += 1
-
-    seq_score=np.zeros( j )
-    #np_sum
-    j = 0  # seq count
-    while j < len(array_score):
-        i = 0  # col count
-        while i < len(col_scores):
-            seq_score[j]=seq_score[j]+array_score[j][i]
-            
-            i += 1
-        j += 1
-
-
-    #obtaining seed_seq related info
-    seed_seq_array = raw_array[np.argmax(seq_score)]
-    seed_seq = "".join(seed_seq_array)
-    for record in full_ali_obj:
-        if str(record.seq) == seed_seq:
-            seed_id = str(record.id)
-
-    seed_to_ali_mapping = [0 if x == '-' else 1 for x in seed_seq_array]  # constructing a mapping list of '-'== 0 & amino acids == 1,2,3,... seed_seq indicating position in the original alignment)
-    i = 0  # track the alignment position
-    j = 1  # track the seed_seq position
-    #print len(seed_seq)
-    while i < len(seed_seq):
-        if seed_to_ali_mapping[i] == 1: 
-            seed_to_ali_mapping[i] = j
-            i += 1
+                i += 1
             j += 1
-        else:
-            i += 1
+
+        seq_score=np.zeros( j )
+        #np_sum
+        j = 0  # seq count
+        while j < len(array_score):
+            i = 0  # col count
+            while i < len(col_scores):
+                seq_score[j]=seq_score[j]+array_score[j][i]
+            
+                i += 1
+            j += 1
+
+
+        #obtaining seed_seq related info
+        seed_seq_array = raw_array[np.argmax(seq_score)]
+        seed_seq = "".join(seed_seq_array)
+        for record in full_ali_obj:
+            if str(record.seq) == seed_seq:
+                seed_id = str(record.id)
+
+        seed_to_ali_mapping = [0 if x == '-' else 1 for x in seed_seq_array]  # constructing a mapping list of '-'== 0 & amino acids == 1,2,3,... seed_seq indicating position in the original alignment)
+        i = 0  # track the alignment position
+        j = 1  # track the seed_seq position
+        #print len(seed_seq)
+        while i < len(seed_seq):
+            if seed_to_ali_mapping[i] == 1: 
+                seed_to_ali_mapping[i] = j
+                i += 1
+                j += 1
+            else:
+                i += 1
     
-    #print '%d \n%s %s\n%s' % (np.amax(seq_score), seed_id, seed_seq, seed_to_ali_mapping)  # check
-    
-    seed_seq_record = SeqRecord(Seq(seed_seq.replace("-","")), id=seed_id)  # remove the 'gap' so it won't affect hmm_aa_freq mapping in the Main Processes
-    SeqIO.write(seed_seq_record, args.output_path+"temp_seed_seq.fasta", "fasta")
+        #print '%d \n%s %s\n%s' % (np.amax(seq_score), seed_id, seed_seq, seed_to_ali_mapping)  # check
+        
+        seed_seq_record = SeqRecord(Seq(seed_seq.replace("-","")), id=seed_id)  # remove the 'gap' so it won't affect hmm_aa_freq mapping in the Main Processes
+       
+        SeqIO.write(seed_seq_record, args.output_path+"temp_seed_seq.fasta", "fasta")
     
     # run hmmscan
     subprocess.check_output([hmmscan_exe, '-o', args.output_path+'temp_hmmscan.out', '-E', '1e-20' ,'--domE','1e-20', args.database, args.output_path+'temp_seed_seq.fasta'])
-
     return (seed_seq_record, seed_to_ali_mapping)
    
 # parse the hmmscan output (TO-DO: need some sort of loop to handle multiple profile hits)
@@ -263,20 +285,19 @@ def hmmscan_parser(out_file, qurey_id):
     domain_info = {}  # store domain(s) info
     for QueryResult in SearchIO.parse(out_file,'hmmer3-text'):
        
-        if qurey_id in str(QueryResult.id):
-            #print QueryResult.description
-            for hit in QueryResult.hits:  # TO-DO: need to control for multiple hits, comparing e-values?
-                domain_info[hit.id] = []
+        #if qurey_id in str(QueryResult.id):   
+        for hit in QueryResult.hits:  # TO-DO: need to control for multiple hits, comparing e-values?
+            domain_info[hit.id] = []
 
-                for HSPFragments in hit.hsps:  # multiple domains
+            for HSPFragments in hit.hsps:  # multiple domains
 
-                    domain_hit_score =HSPFragments.bitscore
-                    query_hit_start = HSPFragments.query_start+1 # parsed start position appears to be 1 site short
-                    query_hit_seq = HSPFragments.query.seq
-                    query_hit_end = HSPFragments.query_end
-                    domain_hit_start = HSPFragments.hit_start+1
-                    domain_hit_end = HSPFragments.hit_end
-                    domain_info[hit.id].append([domain_hit_score, query_hit_end, query_hit_seq, domain_hit_start, domain_hit_end,query_hit_start])
+                domain_hit_score =HSPFragments.bitscore
+                query_hit_start = HSPFragments.query_start+1 # parsed start position appears to be 1 site short
+                query_hit_seq = HSPFragments.query.seq
+                query_hit_end = HSPFragments.query_end
+                domain_hit_start = HSPFragments.hit_start+1
+                domain_hit_end = HSPFragments.hit_end
+                domain_info[hit.id].append([domain_hit_score, query_hit_end, query_hit_seq, domain_hit_start, domain_hit_end,query_hit_start])
                     
 	
 	return domain_info
@@ -609,6 +630,161 @@ aa_freqs_output_file_hmmtrim.close()
 aa_freqs_output_file_gbtrim.close()
 
 print '\nFull alignment:\t\t%s\nHMM_profile mapped alignment:\t%s\nGblock trimmed alignment:\t%s' % (args.output_path+args.file_name+".freq", args.output_path+args.file_name+".hmmtrim.freq", args.output_path+args.file_name+".gbtrim.freq")
+
+
+
+
+
+
+
+
+
+
+#run IQ-TREE
+print"executing iqtree ..."
+
+
+
+'''
+print"runing gbtrim iqtree\n"
+if not os.path.isdir(args.output_path+"trim_gb_iqtree_FREDOM"):
+    os.mkdir(args.output_path+"trim_gb_iqtree_FREDOM", 0777)
+
+#gbtrim iqtree
+copyfile(args.output_path+args.file_name+".gbtrim",args.output_path+"trim_gb_iqtree_FREDOM/"+args.file_name+".gbtrim")
+copyfile(args.output_path+args.file_name+".gbtrim.freq",args.output_path+"trim_gb_iqtree_FREDOM/"+args.file_name+".gbtrim.freq")
+
+subprocess.Popen([iqtree_exe,"-nt","4", "-s",args.file_name+".gbtrim", "-m", "LG+C20+F+G", "-fs",args.file_name+".gbtrim.freq"],cwd=(args.output_path+"trim_gb_iqtree_FREDOM"))
+
+
+
+
+
+
+print" runing hmmtrim iqtree\n"
+if not os.path.isdir(args.output_path+"match_iqtree_FREDOM"):
+    os.mkdir(args.output_path+"match_iqtree_FREDOM", 0777)
+#hmmtrim iqtree
+
+copyfile(args.output_path+args.file_name+".hmmtrim",args.output_path+"match_iqtree_FREDOM/"+args.file_name+".hmmtrim")
+copyfile(args.output_path+args.file_name+".hmmtrim.freq",args.output_path+"match_iqtree_FREDOM/"+args.file_name+".hmmtrim.freq")
+
+subprocess.Popen([iqtree_exe,"-nt","4", "-s",args.file_name+".hmmtrim", "-m", "LG+C20+F+G", "-fs",args.file_name+".hmmtrim.freq"],cwd=(args.output_path+"match_iqtree_FREDOM"))
+
+'''
+
+
+############full fredom iqtree########
+
+if not os.path.isdir(args.output_path+"full_iqtree_FREDOM"):
+    os.mkdir(args.output_path+"full_iqtree_FREDOM", 0777)
+copyfile(args.ali,args.output_path+"full_iqtree_FREDOM/"+args.file_name+".fasta")
+copyfile(args.output_path+args.file_name+".freq",args.output_path+"full_iqtree_FREDOM/"+args.file_name+".freq")
+copyfile(args.iq_path+'iqtree', args.output_path+"full_iqtree_FREDOM/"+"iqtree")
+print args.file_name+".fasta"
+#subprocess.Popen([iqtree_exe,"-nt","4", "-s",args.file_name+".fasta", "-m", "LG+C20+F+G", "-fs", args.file_name+".freq"],cwd=(args.output_path+"full_iqtree_FREDOM"))
+subprocess.Popen(['iqtree', "-s",args.file_name+".fasta", "-m", "LG+C20+F+G", "-fs", args.file_name+".freq"],cwd=(args.output_path+"full_iqtree_FREDOM"))
+
+
+
+
+
+#####--------------------------------------------------------PMSF-----------------------------------------------------#######
+
+
+
+
+
+#####---------------------------guide tree-------------------------------------------######
+
+############full fredom iqtree########
+'''
+if not os.path.isdir(args.output_path+"full_iqtree_PMSF"):
+    os.mkdir(args.output_path+"full_iqtree_PMSF", 0777)
+copyfile(args.ali,args.output_path+"full_iqtree_PMSF/"+args.file_name+".fasta")
+copyfile(args.output_path+args.file_name+".freq",args.output_path+"full_iqtree_PMSF/"+args.file_name+".freq")
+
+subprocess.Popen([iqtree_exe,"-s",args.file_name+".fasta", "-m", "LG+F+G"],cwd=(args.output_path+"full_iqtree_PMSF"))
+
+
+#######gbtrim###############
+if not os.path.isdir(args.output_path+"gbtrim_iqtree_PMSF"):
+    os.mkdir(args.output_path+"gbtrim_iqtree_PMSF", 0777)
+copyfile(args.output_path+args.file_name+".gbtrim",args.output_path+"gbtrim_iqtree_PMSF/"+args.file_name+".gbtrim")
+
+
+subprocess.Popen([iqtree_exe,"-s",args.file_name+".gbtrim", "-m", "LG+F+G"],cwd=(args.output_path+"gbtrim_iqtree_PMSF"))
+
+
+
+
+
+#####hmmtrim#######
+if not os.path.isdir(args.output_path+"hmmtrim_iqtree_PMSF"):
+    os.mkdir(args.output_path+"hmmtrim_iqtree_PMSF", 0777)
+copyfile(args.output_path+args.file_name+".hmmtrim",args.output_path+"hmmtrim_iqtree_PMSF/"+args.file_name+".hmmtrim")
+
+
+subprocess.Popen([iqtree_exe,"-s",args.file_name+".hmmtrim", "-m", "LG+F+G"],cwd=(args.output_path+"hmmtrim_iqtree_PMSF"))
+
+
+
+
+
+
+
+###########----------------IQTREE=======================
+
+
+
+
+
+
+##############full treefile###############
+
+if not os.path.isdir(args.output_path+"full_iqtree_PMSF_guide"):
+    os.mkdir(args.output_path+"full_iqtree_PMSF_guide", 0777)
+copyfile(args.ali,args.output_path+"full_iqtree_PMSF_guide/"+args.file_name+".fasta")
+copyfile(args.output_path+"/full_iqtree_PMSF/"+args.file_name+".fasta.treefile",args.output_path+"full_iqtree_PMSF_guide/"+args.file_name+".fasta.treefile")
+
+subprocess.Popen([iqtree_exe,"-s",args.file_name+".fasta", "-m", "LG+C20+F+G", "-ft", args.file_name+".fasta.treefile"],cwd=(args.output_path+"full_iqtree_PMSF_guide"))
+
+
+
+############gbtrim iqtree############################
+
+
+
+if not os.path.isdir(args.output_path+"gbtrim_iqtree_PMSF_guide"):
+    os.mkdir(args.output_path+"gbtrim_iqtree_PMSF_guide", 0777)
+copyfile(args.output_path+args.file_name+".gbtrim",args.output_path+"gbtrim_iqtree_PMSF_guide/"+args.file_name+".gbtrim")
+copyfile(args.output_path+"/gbtrim_iqtree_PMSF/"+args.file_name+".gbtrim.treefile",args.output_path+"gbtrim_iqtree_PMSF_guide/"+args.file_name+".gbtrim.treefile")
+
+subprocess.Popen([iqtree_exe,"-s",args.file_name+".gbtrim", "-m", "LG+C20+F+G", "-ft", args.file_name+".gbtrim.treefile"],cwd=(args.output_path+"gbtrim_iqtree_PMSF_guide"))
+
+
+
+
+
+
+############hmmtrim iqtree############################
+
+
+
+if not os.path.isdir(args.output_path+"hmmtrim_iqtree_PMSF_guide"):
+    os.mkdir(args.output_path+"hmmtrim_iqtree_PMSF_guide", 0777)
+copyfile(args.output_path+args.file_name+".hmmtrim",args.output_path+"hmmtrim_iqtree_PMSF_guide/"+args.file_name+".hmmtrim")
+copyfile(args.output_path+"/hmmtrim_iqtree_PMSF/"+args.file_name+".hmmtrim.treefile",args.output_path+"hmmtrim_iqtree_PMSF_guide/"+args.file_name+".hmmtrim.treefile")
+
+subprocess.Popen([iqtree_exe,"-s",args.file_name+".hmmtrim", "-m", "LG+C20+F+G", "-ft", args.file_name+".hmmtrim.treefile"],cwd=(args.output_path+"hmmtrim_iqtree_PMSF_guide"))
+
+
+'''
+
+
+
+
+
 
 
 
