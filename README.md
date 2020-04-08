@@ -5,16 +5,13 @@
 
 per-site amino-acid frequency profiles of protein domains
 
-***
+
 ## Usage
 1.Clone the repo.
-
 2.Go to the project's root folder.
-
 3.Please install python and biopython.
-
 4.Use python to execuate your files.
-***
+
 ## required parameter
 ### --ali (input alignment) 
 
@@ -22,6 +19,11 @@ per-site amino-acid frequency profiles of protein domains
 the directory of your output path
 
 ## optional parameter
+### --mode con(default)|rep
+how to construct a sequence for HMM data base search
++ con : generate a consensus sequence found using *hmmemit* with --symfra 0
++ rep : pick up a representative single sequence from input alignment with highest pairwise similarity
+
 ### --database (hmm database)   
 the hmm database you want to use. (default version: 3.1b1 | May 2013)
 
@@ -36,7 +38,7 @@ your output file name. (default is your input file name)
 the path of your gblocks file (default version: 0.91b)
 ### --iq_path (path)
 the path of your iqtree file (default version: 1.6.10)
-***
+
 ## example 
 ### use command:
 python freq_extractor.py --ali example_files/example_input.fasta --output_path output --file_name example1
