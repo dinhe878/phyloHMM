@@ -1,45 +1,40 @@
 # phyloHMM (now this is underconstruction)
-
-
-## Purpose
-
 per-site amino-acid frequency profiles of protein domains
 
 
 ## Usage
-1.Clone the repo.
-2.Go to the project's root folder.
-3.Please install python and biopython.
-4.Use python to execuate your files.
+1. Clone the repo.
+2. Go to the project's root folder.
+3. Please install python and biopython.
+4. Use python to execuate your files.
 
-## required parameter
-### --ali (input alignment) 
-
-### --output_path (path)  
+### Required parameter
+#### --ali (input alignment) 
+#### --output_path (path)  
 the directory of your output path
 
-## optional parameter
-### --mode con(default)|rep
+### Optional parameter
+#### --mode con(default)|rep
 how to construct a sequence for HMM data base search
 + con : generate a consensus sequence found using *hmmemit* with --symfra 0
 + rep : pick up a representative single sequence from input alignment with highest pairwise similarity
 
-### --database (hmm database)   
+#### --database (hmm database)   
 the hmm database you want to use. (default version: 3.1b1 | May 2013)
 
 
-### --file_name (output file name)  
+#### --file_name (output file name)  
 your output file name. (default is your input file name)
 
-### --hmmer_path (path)
+#### --hmmer_path (path)
   the path of your hmmer scripts (hmmfetch hmmpress hmmscan)  (default version: h3.1b2 | February 2015)
 
-### --gb_path (path)
+#### --gb_path (path)
 the path of your gblocks file (default version: 0.91b)
-### --iq_path (path)
+#### --iq_path (path)
 the path of your iqtree file (default version: 1.6.10)
 
-## example 
+## Example 
 ### use command:
 python freq_extractor.py --ali example_files/example_input.fasta --output_path output --file_name example1
 ## Support or Contact
