@@ -57,8 +57,8 @@ optional.add_argument('--file_name', help='output file name', default='dEfAuLt')
 optional.add_argument('--hmmer_path', help='HMMER executable directory', default='bin/')
 optional.add_argument('--gb_path', help='Gblocks executable directory', default='bin/')
 optional.add_argument('--iq_path', help='IQ-TREE executable directory', default='bin/')
-optional.add_argument('--seed_seq', help='--mode consensus (default) : a consensus sequence found by hmmemit with--symfra 0\
-    --mode representative : a representative single sequence with highest pairwise similarity', default='consensus')
+optional.add_argument('--mode', help='--mode con (default) : a consensus sequence found by hmmemit with--symfra 0\
+    --mode rep : a representative single sequence with highest pairwise similarity', default='con')
 #optional.add_argument('--iqtree', action='store_true', help='flag to output frequency file in IQ-TREE supported format')
 args = parser.parse_args()  # e.g. input alignment file: args.ali; output freq_file: args.out
 # Demanding required input
@@ -196,7 +196,7 @@ def ali_parser(alignment_file):
     
 
     # optional parameter  use score or hmmemit to choose seed sequence    #args.ali
-    if args.seed_seq == 'consensus':
+    if args.mode == 'con':
         
         subprocess.check_output([hmmbuild_exe, '--symfrac', '0', args.output_path+args.file_name+'.hmm', args.ali])    
         subprocess.check_output([hmmemit_exe, '-c', '-o', args.output_path+'temp_seed_seq.fasta', args.output_path+args.file_name+'.hmm'])
@@ -207,7 +207,7 @@ def ali_parser(alignment_file):
         seed_to_ali_mapping = [x+1 for x in range(len(seed_seq_record))]
 
 
-    elif args.seed_seq == 'representative':
+    elif args.mode == 'rep':
 
         full_ali_obj = AlignIO.read(alignment_file, "fasta")
         for record in full_ali_obj:
@@ -639,6 +639,53 @@ print '\nFull alignment:\t\t%s\nHMM_profile mapped alignment:\t%s\nGblock trimme
 
 
 
+
+#run IQ-TREE
+print"executing iqtree ..."
+
+
+
+'''
+print"runing gbtrim iqtree\n"
+if not os.path.isdir(args.output_path+"trim_gb_iqtree_FREDOM"):
+    os.mkdir(args.output_path+"trim_gb_iqtree_FREDOM", 0777)
+
+#gbtrim iqtree
+copyfile(args.output_path+args.file_name+".gbtrim",args.output_path+"trim_gb_iqtree_FREDOM/"+args.file_name+".gbtrim")
+copyfile(args.output_path+args.file_name+".gbtrim.freq",args.output_path+"trim_gb_iqtree_FREDOM/"+args.file_name+".gbtrim.freq")
+
+subprocess.Popen([iqtree_exe,"-nt","4", "-s",args.file_name+".gbtrim", "-m", "LG+C20+F+G", "-fs",args.file_name+".gbtrim.freq"],cwd=(args.output_path+"trim_gb_iqtree_FREDOM"))
+
+
+
+
+
+
+print" runing hmmtrim iqtree\n"
+if not os.path.isdir(args.output_path+"match_iqtree_FREDOM"):
+    os.mkdir(args.output_path+"match_iqtree_FREDOM", 0777)
+#hmmtrim iqtree
+
+copyfile(args.output_path+args.file_name+".hmmtrim",args.output_path+"match_iqtree_FREDOM/"+args.file_name+".hmmtrim")
+copyfile(args.output_path+args.file_name+".hmmtrim.freq",args.output_path+"match_iqtree_FREDOM/"+args.file_name+".hmmtrim.freq")
+
+subprocess.Popen([iqtree_exe,"-nt","4", "-s",args.file_name+".hmmtrim", "-m", "LG+C20+F+G", "-fs",args.file_name+".hmmtrim.freq"],cwd=(args.output_path+"match_iqtree_FREDOM"))
+
+
+
+
+############full fredom iqtree########
+
+if not os.path.isdir(args.output_path+"full_iqtree_FREDOM"):
+    os.mkdir(args.output_path+"full_iqtree_FREDOM", 0777)
+copyfile(args.ali,args.output_path+"full_iqtree_FREDOM/"+args.file_name+".fasta")
+copyfile(args.output_path+args.file_name+".freq",args.output_path+"full_iqtree_FREDOM/"+args.file_name+".freq")
+copyfile(args.iq_path+'iqtree', args.output_path+"full_iqtree_FREDOM/"+"iqtree")
+print args.file_name+".fasta"
+#subprocess.Popen([iqtree_exe,"-nt","4", "-s",args.file_name+".fasta", "-m", "LG+C20+F+G", "-fs", args.file_name+".freq"],cwd=(args.output_path+"full_iqtree_FREDOM"))
+subprocess.Popen(['iqtree', "-s",args.file_name+".fasta", "-m", "LG+C20+F+G", "-fs", args.file_name+".freq"],cwd=(args.output_path+"full_iqtree_FREDOM"))
+
+'''
 
 
 
