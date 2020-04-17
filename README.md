@@ -16,7 +16,7 @@ the directory of your output path
 ### Optional parameter
 #### --mode con(default)|rep
 how to construct a sequence for HMM data base search
-+ con : generate a consensus sequence found using *hmmemit* with --symfra 0
++ con : generate a consensus sequence found using `hmmemit --symfrac 0`
 + rep : pick up a representative single sequence from input alignment with highest pairwise similarity
 
 #### --database (hmm database)   
