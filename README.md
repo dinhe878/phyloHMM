@@ -36,7 +36,7 @@ the path of your iqtree file (default version: 1.6.10)
 
 ## Example 
 ### use command:
-python freq_extractor.py --ali example_files/example_input.fasta --output_path output --file_name example1
+python3 freq_extractor.py --ali example_files/example_input.fasta --output_path output --file_name example1
 ## Support or Contact
 
 Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
