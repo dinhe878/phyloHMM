@@ -1,3 +1,9 @@
+How to use phyloHMM?
+=============================
+
+Quick start
+-----
+
 Required parameter
 ~~~~~~~~~~~~~~~~~~
 
