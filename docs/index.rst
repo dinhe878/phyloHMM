@@ -8,4 +8,3 @@ per-site amino-acid frequency profiles of protein domains
 
    Requirements and Installation <install>
    Usage <usage>
-   About file formats <format>
