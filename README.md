@@ -1,5 +1,5 @@
 # phyloHMM (now this is underconstruction)
-per-site amino-acid frequency profiles of protein domains
+per-site amino-acid frequency profiles of protein domains.
 A detailed document is avaiable in [the readthedocs of phyloHMM](https://phyloHMM.readthedocs.io/).
 
 ## Usage
