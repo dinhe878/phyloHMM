@@ -59,6 +59,8 @@ optional.add_argument('--gb_path', help='Gblocks executable directory', default=
 optional.add_argument('--iq_path', help='IQ-TREE executable directory', default='bin/')
 optional.add_argument('--mode', help='--mode con (default) : a consensus sequence found by hmmemit with--symfra 0\
     --mode rep : a representative single sequence with highest pairwise similarity', default='con')
+optional.add_argument('--profile_threshold', help='profile threshold for hmmscan', default='1e-20')
+optional.add_argument('--domain_threshold', help='domain threshold for hmmscan', default='1e-20')
 #optional.add_argument('--iqtree', action='store_true', help='flag to output frequency file in IQ-TREE supported format')
 args = parser.parse_args()  # e.g. input alignment file: args.ali; output freq_file: args.out
 # Demanding required input
@@ -215,7 +217,7 @@ def ali_parser(alignment_file):
 
 
 
-        raw_array = np.array([list(rec) for rec in full_ali_obj], np.character, order="F")  # Convert alignment object to np_array object
+        raw_array = np.array([list(rec) for rec in full_ali_obj], order="F")  # Convert alignment object to np_array object
         col_array = np.transpose(raw_array)  # align_columns.shape == (#col, #raw), i.e. (#site, #seq)
 
         # compute the columne scores (as the proxy for seq coverage percentage)
@@ -277,7 +279,9 @@ def ali_parser(alignment_file):
         SeqIO.write(seed_seq_record, args.output_path+"temp_seed_seq.fasta", "fasta")
     
     # run hmmscan
-    subprocess.check_output([hmmscan_exe, '-o', args.output_path+'temp_hmmscan.out', '-E', '1e-20' ,'--domE','1e-20', args.database, args.output_path+'temp_seed_seq.fasta'])
+    domain_threshold = args.profile_threshold
+    profile_threshold = args.domain_threshold
+    subprocess.check_output([hmmscan_exe, '-o', args.output_path+'temp_hmmscan.out', '-E', profile_threshold ,'--domE', domain_threshold, args.database, args.output_path+'temp_seed_seq.fasta'])
     return (seed_seq_record, seed_to_ali_mapping)
    
 # parse the hmmscan output (TO-DO: need some sort of loop to handle multiple profile hits)
@@ -315,6 +319,9 @@ def add_default_model(alignment,default_model):
     return alignment
 
 def check_domain_position(start,end,lists):
+    print("Start: "+ str(start))
+    print("End: "+ str(end))
+    print("Length: "+str(len(lists)))
     flag=0
     if start==0 and end==0:
         return False
@@ -342,7 +349,6 @@ hmm_database = {}
 
 for key, value in domains.items():
 #hmm_database = HMM(args.database, seed_seq.id).hmm_database  # Storing target hmm profile into a HMM Class which is structured as a dictionary
-    
     hmm_database = HMM(args.database, key,hmm_database )
 
 alimentObj = AlignIO.read(args.ali, "fasta")
@@ -370,15 +376,16 @@ highestend=0
 seq_start_end_list = []
 #Getting the aa_freqs from respective hmms, storing structure see HMM.py
 for hmm_name, hits in sorted(domains.items(), key=operator.itemgetter([1][0]),reverse=True):  #The aa_seqs should be recorded in from the N-terminal to C-terminal of the seed seq
-
-       
+    
+    #print(hmm_database[hmm_name][0]['A'][0])
     highestscore=0
     if hmm_database[hmm_name] is not None:
-        for hit_info in hits:    
+        for hit_info in hits:
             seed_seq_m_start = int(hit_info[5])  #Seed seq match start
             score=float(hit_info[0])
             seq_count=seed_seq_m_start
-            
+                
+            print(hit_info)
 
             seed_seq_m_end = int(hit_info[1])  #Seed seq match end
            
@@ -387,11 +394,11 @@ for hmm_name, hits in sorted(domains.items(), key=operator.itemgetter([1][0]),re
             dm_end = int(hit_info[4])  #Doamin match end
             # Mapping the aa_freqs to seed_seq sites according to the hmmscan output
             hmmscan_seed_seq = list(dm_seed_seq)  #A list storing dm_seed_seq site-by-site
-
+            
+            print(len(hmmscan_seed_seq));
             j = 0  #Check for insert state so the pointer maps correctly to the domain position
             for i, seed_seq_site in enumerate(hmmscan_seed_seq):
-                
-                
+    
                 if seed_seq_site.isalpha() and seed_seq_site.isupper():
                     #Replace the site with a list of matching-state aa_freqs in the order of 'ARNDCQEGHILKMFPSTWYV'
                     #print i, seed_seq_site, i+dm_start-1-j, hmm_database[hmm_name][0]['A'][0][i+dm_start-1-j]  # Check
@@ -440,25 +447,23 @@ for hmm_name, hits in sorted(domains.items(), key=operator.itemgetter([1][0]),re
                     hmmscan_seed_seq[i].append(hmm_database[hmm_name][0]['Y'][1][i+dm_start-1-j])
                     hmmscan_seed_seq[i].append(hmm_database[hmm_name][0]['V'][1][i+dm_start-1-j])
                 elif seed_seq_site == '-':
-                    pass
-                    #continue  #Skipping the deletion state
+                #    pass
+                    continue  #Skipping the deletion state
                 else:
                     print ("Something is not right!!!")
                     break
-
-                                
+                
                 if  local_seed_seq_master[seq_count]:
                     pass
                 else:
-
                     local_seed_seq_master[seq_count]= hmmscan_seed_seq[i]
                 seq_count+=1
             #seed_seq_master += hmmscan_seed_seq
             if score>highestscore:
                 highestscore=score
                 max_seed_seq_master=local_seed_seq_master
-                higheststart= seed_seq_m_start
-                highestend=seed_seq_m_end
+                higheststart= seed_seq_m_start - 1
+                highestend=seed_seq_m_end - 1
 
 
 
@@ -470,7 +475,7 @@ for hmm_name, hits in sorted(domains.items(), key=operator.itemgetter([1][0]),re
         while higheststart<=highestend:
             seed_seq_master[higheststart]=max_seed_seq_master[higheststart]
             higheststart+=1
-
+            
         
 
 
@@ -479,14 +484,14 @@ for hmm_name, hits in sorted(domains.items(), key=operator.itemgetter([1][0]),re
 
 for i, aa_freqs in enumerate(seed_seq_master):
     #if isinstance(aa_freqs, list):
-     if  seed_seq_master[i]=='-':
-         continue
-     elif seed_seq_master[i] :
+    if  seed_seq_master[i]=='-':
+        continue
+    elif seed_seq_master[i] :
          aa_freqs = map(lambda x: float(x), aa_freqs)
          aa_freqs = map(lambda x: math.exp(-x),aa_freqs)  # aa_freq unit concersion (need to check possible numerical problem: sum(aa_freq) == 1 for each site)
          aa_freqs = map(lambda x: str(x), aa_freqs)
          seed_seq_master[i] = " ".join(aa_freqs)  # Construct the aa_freq string
-     else:
+    else:
 
         pass
 seed_seq_master = list(filter(lambda x: x != "-", seed_seq_master))  #Discard deletion states "-"
@@ -500,7 +505,6 @@ for i in range(0,len(seq_start_end_list),2):
         seed_to_ali_mapping = [seed_seq_master[seed_seq_m_start] if x == seed_seq_m_start else x for x in seed_to_ali_mapping]
         seed_seq_m_start += 1
   
-
 '''
 while seed_seq_m_start <= seed_seq_m_end:
     for site_aa_freq in seed_seq_master:
@@ -512,7 +516,6 @@ while seed_seq_m_start <= seed_seq_m_end:
 
 
 full_ali_obj = AlignIO.read(args.ali, "fasta")  # have to read the original alignment again!
-
 # Executing Gblocks processes
 # Make seq names shorter so Gblocks is happy (<= 15 characters, I think...)
 i = 0
@@ -646,9 +649,9 @@ print("executing iqtree ...")
 
 
 '''
-print"runing gbtrim iqtree\n"
+print ("runing gbtrim iqtree")
 if not os.path.isdir(args.output_path+"trim_gb_iqtree_FREDOM"):
-    os.mkdir(args.output_path+"trim_gb_iqtree_FREDOM", 0777)
+    os.mkdir(args.output_path+"trim_gb_iqtree_FREDOM", 0o777)
 
 #gbtrim iqtree
 copyfile(args.output_path+args.file_name+".gbtrim",args.output_path+"trim_gb_iqtree_FREDOM/"+args.file_name+".gbtrim")
@@ -661,7 +664,7 @@ subprocess.Popen([iqtree_exe,"-nt","4", "-s",args.file_name+".gbtrim", "-m", "LG
 
 
 
-print" runing hmmtrim iqtree\n"
+print ("runing hmmtrim iqtree")
 if not os.path.isdir(args.output_path+"match_iqtree_FREDOM"):
     os.mkdir(args.output_path+"match_iqtree_FREDOM", 0777)
 #hmmtrim iqtree
@@ -671,21 +674,23 @@ copyfile(args.output_path+args.file_name+".hmmtrim.freq",args.output_path+"match
 
 subprocess.Popen([iqtree_exe,"-nt","4", "-s",args.file_name+".hmmtrim", "-m", "LG+C20+F+G", "-fs",args.file_name+".hmmtrim.freq"],cwd=(args.output_path+"match_iqtree_FREDOM"))
 
-
-
-
+'''
 ############full fredom iqtree########
 
-if not os.path.isdir(args.output_path+"full_iqtree_FREDOM"):
-    os.mkdir(args.output_path+"full_iqtree_FREDOM", 0777)
-copyfile(args.ali,args.output_path+"full_iqtree_FREDOM/"+args.file_name+".fasta")
-copyfile(args.output_path+args.file_name+".freq",args.output_path+"full_iqtree_FREDOM/"+args.file_name+".freq")
-copyfile(args.iq_path+'iqtree', args.output_path+"full_iqtree_FREDOM/"+"iqtree")
-print args.file_name+".fasta"
-#subprocess.Popen([iqtree_exe,"-nt","4", "-s",args.file_name+".fasta", "-m", "LG+C20+F+G", "-fs", args.file_name+".freq"],cwd=(args.output_path+"full_iqtree_FREDOM"))
-subprocess.Popen(['iqtree', "-s",args.file_name+".fasta", "-m", "LG+C20+F+G", "-fs", args.file_name+".freq"],cwd=(args.output_path+"full_iqtree_FREDOM"))
+cwd = os.getcwd() + "/"
+print("current working directory: " + cwd)
 
-'''
+print ("running full iqtree")
+if not os.path.isdir(args.output_path+"full_iqtree_FREDOM"):
+    os.mkdir(args.output_path+"full_iqtree_FREDOM", 0o777)
+#copyfile(args.ali,args.output_path+"full_iqtree_FREDOM/"+args.file_name+".fasta")
+#copyfile(args.output_path+args.file_name+".freq",args.output_path+"full_iqtree_FREDOM/"+args.file_name+".freq")
+#copyfile(args.iq_path+'iqtree', args.output_path+"full_iqtree_FREDOM/"+"iqtree")
+print (args.file_name+".fasta")
+#subprocess.Popen([cwd + iqtree_exe,"-nt","4", "-s",args.file_name+".fasta", "-m", "LG+C20+F+G", "-fs", args.file_name+".freq"],cwd=(args.output_path+"full_iqtree_FREDOM"))
+subprocess.Popen([cwd + iqtree_exe,"-nt","4", "-s",args.ali, "-m", "LG+C20+F+G", "-fs", args.output_path +  args.file_name+".freq"],cwd=(args.output_path+"full_iqtree_FREDOM"))
+#subprocess.Popen(['./iqtree', "-s",args.file_name+".fasta", "-m", "LG+C20+F+G", "-fs", args.file_name+".freq"],cwd=(args.output_path+"full_iqtree_FREDOM"))
+
 
 
 
