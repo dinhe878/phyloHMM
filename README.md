@@ -27,7 +27,7 @@ the hmm database you want to use. (default version: 3.1b1 | May 2013)
 your output file name. (default is your input file name)
 
 #### --hmmer_path (path)
-  the path of your hmmer scripts (hmmfetch hmmpress hmmscan)  (default version: h3.1b2 | February 2015)
+  the path of your hmmer scripts (hmmfetch hmmpress hmmscan hmmbuild hmmemit)  (default version: h3.1b2 | February 2015)
 
 #### --gb_path (path)
 the path of your gblocks file (default version: 0.91b)
